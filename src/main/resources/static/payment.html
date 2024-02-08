@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div id="ten-countdown"></div>
+<section style="background-color: chocolate;">
+    <div class="container py-5">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-9 col-lg-7 col-xl-5">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title d-flex justify-content-between mb-0">
+                            <p class="mb-0"></p>
+                        </div>
+                    </div>
+                    <div class="rounded-bottom" style="background-color: chocolate">
+                        <div class="card-body">
+                            <h4 class="card-title">Order ID: <span id="orderId"></span></h4>
+                            <h4 class="card-title">Price: <span id="price"></span></h4>
+                            <h4 class="card-title">Specialist ID: <span id="specialistId"></span></h4>
+
+                            <p class="mb-4">Your payment details</p>
+
+                            <div class="form-outline mb-3">
+                                <input type="text" id="cardNumber" class="form-control" placeholder="1234567812345678"/>
+                                <label class="form-label" for="cardNumber">Card Number</label>
+                            </div>
+
+                            <div class="form-outline mb-3">
+                                <input type="password" maxlength="6" minlength="3" id="cvv" class="form-control"
+                                       placeholder="Cvv2"/>
+                                <label class="form-label" for="cvv">Cvv</label>
+                            </div>
+
+                            <div class="form-outline mb-3">
+                                <input type="text" id="mm" class="form-control" placeholder="MM"/>
+                                <label class="form-label" for="mm">Month</label>
+                            </div>
+
+                            <div class="form-outline mb-3">
+                                <input type="text" id="yy" class="form-control" placeholder="YY"/>
+                                <label class="form-label" for="yy">Year</label>
+                            </div>
+
+                            <div class="form-outline mb-3">
+                                <input type="password" maxlength="8" minlength="4" id="password" class="form-control"
+                                       placeholder="Password"/>
+                                <label class="form-label" for="password">Password</label>
+                            </div>
+
+                            <div class="form-outline mb-3">
+                                <input type="text" id="captchaLoad" class="form-control" placeholder="Enter CAPTCHA"
+                                       disabled/>
+                                <label class="form-label" for="captchaLoad">LOADED CAPTCHA</label>
+                            </div>
+
+                            <div class="form-outline mb-3">
+                                <input type="text" id="captcha" class="form-control" placeholder="Enter CAPTCHA"
+                                       required/>
+                                <label class="form-label" for="captcha">CAPTCHA</label>
+                            </div>
+
+
+                            <button type="submit" value="submit" id="submit" class="btn btn-info btn-block">Pay now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    const searchParam = new URLSearchParams(window.location.search)
+    var orderId = searchParam.get('orderId')
+    var price = searchParam.get('price')
+    var specialists = searchParam.get('specialistId')
+
+
+    window.onload = function () {
+    //     fetch('http://localhost:8080/payment-getaway/payment/' + orderId + '/' + price + '/' + specialists).then(response => {
+    //         return response.json()
+    //
+    //     }).then(object => {
+            document.getElementById('orderId').textContent = orderId
+            document.getElementById('price').textContent = price
+            document.getElementById('specialistId').textContent = specialists
+    //     })
+    }
+
+
+    // Function to fetch and display CAPTCHA
+    function loadCaptcha() {
+        fetch('http://localhost:8080/api/captcha')
+            .then(response => response.text())
+            .then(captchaText => {
+                document.getElementById('captchaLoad').value = captchaText;
+            })
+            .catch(error => console.log('Error fetching CAPTCHA:', error));
+    }
+
+    // Load CAPTCHA when the page loads
+    window.addEventListener('load', loadCaptcha);
+
+    document.getElementById('submit').addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent the form from submitting the traditional way
+
+        const data = {
+            "bankAccountNumber": document.getElementById("cardNumber").value,
+            "cvv2": document.getElementById("cvv").value,
+            "month": document.getElementById("mm").value,
+            "year": document.getElementById("yy").value,
+            "password": document.getElementById("password").value,
+            "captchaAnswer": document.getElementById("captcha").value,
+            "orderId": orderId,
+            "price": price,
+            "specialistId": specialists
+        };
+
+        // Verify CAPTCHA before making the payment request
+        fetch('http://localhost:8080/api/verify-captcha', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({captchaAnswer: data.captchaAnswer}) // Only send the captcha answer for verification
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Assuming the captcha was correct, now send the whole data for the payment
+                    return fetch('http://localhost:8080/payment-getaway/online/finalPaymentFromOnlineGateway', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data) // Now send all the data for payment
+                    });
+                } else {
+                    throw new Error("Invalid CAPTCHA");
+                }
+            })
+            .then(response => {
+                // Handle the payment response here
+                if (response.ok) {
+                    alert('Payment successful!');
+                } else {
+                    alert('Payment failed: ' + response.status);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred: ' + error.message);
+            });
+    });
+</script>
+</body>
+</html>
