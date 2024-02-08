@@ -19,4 +19,6 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
     )
     Integer checkUniqueEmail(String email);
 
+
+
 }

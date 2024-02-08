@@ -1,13 +1,14 @@
 package ir.example.finalPart03.service.impl;
 
+import ir.example.finalPart03.config.exceptions.BadRequestException;
+import ir.example.finalPart03.config.exceptions.DuplicateException;
+import ir.example.finalPart03.config.exceptions.NotFoundException;
 import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.model.SubServices;
 import ir.example.finalPart03.model.enums.SpecialistStatus;
 import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SubServicesRepository;
 import ir.example.finalPart03.service.SpecialistService;
-import jakarta.persistence.NoResultException;
-import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,27 +36,26 @@ public class SpecialistServiceImpl implements SpecialistService {
     public Specialist saveSpecialist(Specialist specialist) {
         try {
             if (!checkUniqueEmail(specialist.getEmail(), specialist.getId())) {
-                throw new ValidationException("this Email is already exists");
+                throw new DuplicateException("this Email is already exists");
             }
-
+            specialist.setSpecialistStatus(SpecialistStatus.WAIT_FOR_CONFIRMED);
             return specialistRepository.save(specialist);
         } catch (Exception e) {
-            System.err.println("Can't save or update customer data: " + e.getMessage());
+            throw new BadRequestException("Can't save or update customer data: " + e.getMessage());
         }
-        return null;
     }
 
     @Override
     public Specialist findByEmailAndPassword(String email, String password) {
         return specialistRepository.findByEmailAndPassword(email, password)
-                .orElseThrow(() -> new NoResultException("this email is not found!"));
+                .orElseThrow(() -> new NotFoundException("this email is not found!"));
 
     }
 
     @Override
     public Boolean checkingSpecialistStatus(Long specialistId) {
         Specialist specialist = specialistRepository.findById(specialistId)
-                .orElseThrow(() -> new NoSuchElementException("Specialist with ID: " + specialistId + " was not found."));
+                .orElseThrow(() -> new NotFoundException("Specialist with ID: " + specialistId + " was not found."));
 
         SpecialistStatus status = specialist.getSpecialistStatus();
         return status == SpecialistStatus.CONFIRMED;
@@ -66,11 +66,11 @@ public class SpecialistServiceImpl implements SpecialistService {
     public void confirmingSpecialStatus(Long specialistId) {
         try {
             Specialist specialist = specialistRepository.findById(specialistId)
-                    .orElseThrow(() -> new NoResultException("cant find anything whit this id."));
+                    .orElseThrow(() -> new NotFoundException("cant find anything whit this id."));
             specialist.setSpecialistStatus(SpecialistStatus.CONFIRMED);
             specialistRepository.save(specialist);
         } catch (Exception e) {
-            System.err.println("there is problem with updating specialistStatus");
+            throw new BadRequestException("there is problem with updating specialistStatus" + e.getMessage());
         }
     }
 
@@ -82,8 +82,7 @@ public class SpecialistServiceImpl implements SpecialistService {
         try (FileOutputStream fos = new FileOutputStream("C:\\Users\\Data\\IdeaProjects\\finalPart2\\src\\main\\resources\\extractedImage\\id_number" + id + ".jpg")) {
             fos.write(image);
         } catch (IOException e) {
-            System.err.println("img is not found");
-            e.printStackTrace();
+            throw new BadRequestException("img is not found" + e.getMessage());
         }
     }
 
@@ -94,7 +93,7 @@ public class SpecialistServiceImpl implements SpecialistService {
             throw new RuntimeException("password and confirming password is not the same");
         }
         Specialist specialist = specialistRepository.findById(id)
-                .orElseThrow(() -> new NoResultException("this specialistId is not found!"));
+                .orElseThrow(() -> new NotFoundException("this specialistId is not found!"));
         specialist.setPassword(password);
         return specialistRepository.save(specialist);
     }
@@ -105,12 +104,12 @@ public class SpecialistServiceImpl implements SpecialistService {
         if (specialistIdForUpdate == null) {
             Integer checked = specialistRepository.checkUniqueEmailForNewSpecialist(email);
             if (checked > 0) {
-                throw new RuntimeException("The email you entered is already exist. Try another.");
+                throw new DuplicateException("The email you entered is already exist. Try another.");
             }
         } else {
             Integer checked = specialistRepository.checkUniqueEmailForExistingSpecialist(email, specialistIdForUpdate);
             if (checked > 0) {
-                throw new RuntimeException("The email you entered is already used by another specialist.");
+                throw new DuplicateException("The email you entered is already used by another specialist.");
             }
         }
         return true;
@@ -120,9 +119,9 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Override
     public void addSubServiceToSpecialist(Long specialistId, Long subServiceId) {
         Specialist specialist = specialistRepository.findById(specialistId)
-                .orElseThrow(() -> new RuntimeException("Specialist not found"));
+                .orElseThrow(() -> new NotFoundException("Specialist not found"));
         SubServices subService = subServicesRepository
-                .findById(subServiceId).orElseThrow(() -> new RuntimeException("SubService not found"));
+                .findById(subServiceId).orElseThrow(() -> new NotFoundException("SubService not found"));
 
         if (specialist.getSubServices() == null) {
             specialist.setSubServices(new HashSet<>());
@@ -140,15 +139,14 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Override
     public Specialist seeAverageScore(Long specialistId) {
         Specialist specialist = specialistRepository.findById(specialistId)
-                .orElseThrow(() -> new NoResultException("cant find specialist,wrong specialistId"));
+                .orElseThrow(() -> new NotFoundException("cant find specialist,wrong specialistId"));
         try {
             Double averageScore = specialistRepository.avgSpecialistScoreBySpecialistId(specialistId);
             specialist.setAverageScores(averageScore);
             return specialistRepository.save(specialist);
 
         } catch (Exception e) {
-            System.err.println("cant set average score to specialist,try again");
+            throw new BadRequestException("cant set average score to specialist,try again" + e.getMessage());
         }
-        return null;
     }
 }

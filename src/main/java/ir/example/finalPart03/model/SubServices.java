@@ -13,10 +13,6 @@ import java.io.Serializable;
 import java.util.Set;
 
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @SuperBuilder
 @ToString
@@ -39,4 +35,64 @@ public class SubServices extends BaseEntity<Long> implements Serializable {
     @ManyToMany(mappedBy = "subServices", cascade = CascadeType.REMOVE)
     Set<Specialist> specialists;
 
+
+    public SubServices(Long aLong, String subServiceName, Double basePrice, String description, Services services, Set<Specialist> specialists) {
+        super(aLong);
+        this.subServiceName = subServiceName;
+        this.basePrice = basePrice;
+        this.description = description;
+        this.services = services;
+        this.specialists = specialists;
+    }
+
+    public SubServices(String subServiceName, Double basePrice, String description, Services services, Set<Specialist> specialists) {
+        this.subServiceName = subServiceName;
+        this.basePrice = basePrice;
+        this.description = description;
+        this.services = services;
+        this.specialists = specialists;
+    }
+
+    public SubServices() {
+    }
+
+    public String getSubServiceName() {
+        return subServiceName;
+    }
+
+    public void setSubServiceName(String subServiceName) {
+        this.subServiceName = subServiceName;
+    }
+
+    public Double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(Double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Services getServices() {
+        return services;
+    }
+
+    public void setServices(Services services) {
+        this.services = services;
+    }
+
+    public Set<Specialist> getSpecialists() {
+        return specialists;
+    }
+
+    public void setSpecialists(Set<Specialist> specialists) {
+        this.specialists = specialists;
+    }
 }

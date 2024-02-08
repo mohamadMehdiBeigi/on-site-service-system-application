@@ -1,15 +1,18 @@
 package ir.example.finalPart03.service.impl;
 
 import ir.example.finalPart03.config.exceptions.BadRequestException;
+import ir.example.finalPart03.config.exceptions.DuplicateException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
 import ir.example.finalPart03.model.BankAccount;
+import ir.example.finalPart03.model.Customer;
+import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.repository.BankAccountRepository;
 import ir.example.finalPart03.service.BankAccountService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class BankAccountServiceImpl implements BankAccountService {
 
     private BankAccountRepository bankAccountRepository;
@@ -18,8 +21,56 @@ public class BankAccountServiceImpl implements BankAccountService {
         this.bankAccountRepository = bankAccountRepository;
     }
 
+
     @Override
-    public Double orderPaymentByCustomerFromCredit(Long customerId, Double paymentAmount) {
+    public BankAccount saveBankAccount(BankAccount bankAccount, Long specialistId, Long customerId) {
+        try {
+            if (specialistId != null && customerId != null) {
+                throw new DuplicateException("account number cant not be belong to a specialist and customer at the same time");
+            }
+            if (specialistId != null) {
+                Specialist specialist = new Specialist();
+                specialist.setId(specialistId);
+                bankAccount.setSpecialist(specialist);
+
+            } else if (customerId != null) {
+                Customer customer = new Customer();
+                customer.setId(customerId);
+                bankAccount.setCustomer(customer);
+            }
+            return bankAccountRepository.save(bankAccount);
+
+        } catch (Exception e) {
+            throw new BadRequestException("invalid input for saving your bank account" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void finalPaymentByCustomerFromCredit(Long customerId, Long specialistId, Double paymentAmount) {
+        try {
+            Double payment = orderPaymentByCustomerFromCredit(customerId, paymentAmount);
+            depositToSpecialistBalance(specialistId, payment);
+        } catch (Exception e) {
+            throw new BadRequestException("invalid customer or specialist id" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void finalPaymentByCustomerFromOnlinePaymentGateway(BankAccount bankAccount, Long specialistId, Double depositAmount) {
+        try {
+            BankAccount byAllColumns = findByAllColumns(bankAccount);
+            if (byAllColumns == null) {
+                throw new NotFoundException("there is no bank account with this inputs");
+            }
+
+            depositToSpecialistBalance(specialistId, depositAmount);
+        } catch (Exception e) {
+            throw new BadRequestException("invalid inputs for deposit to specialist account" + e.getMessage());
+        }
+    }
+
+
+    private Double orderPaymentByCustomerFromCredit(Long customerId, Double paymentAmount) {
         BankAccount bankAccount = bankAccountRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new RuntimeException("this customer id is not exist"));
         try {
@@ -38,14 +89,8 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     }
 
-    @Override
-    public BankAccount orderPaymentByCustomerByOnlinePayment(Long customerId, Double paymentAmount) {
-        return null;
-    }
 
-
-    @Override
-    public void depositToSpecialistBalance(Long specialistId, Double depositAmount) {
+    private void depositToSpecialistBalance(Long specialistId, Double depositAmount) {
 
         BankAccount bankAccount = bankAccountRepository.findBySpecialistId(specialistId)
                 .orElseThrow(() -> new NotFoundException("this specialist id is not exist"));
@@ -59,4 +104,12 @@ public class BankAccountServiceImpl implements BankAccountService {
             throw new BadRequestException("there is problem with payment");
         }
     }
+
+
+    private BankAccount findByAllColumns(BankAccount bankAccount) {
+        return bankAccountRepository.findByBankAccountNumberAndCvv2AndExpiryDateAndPassword(bankAccount.getBankAccountNumber(), bankAccount.getCvv2(), bankAccount.getExpiryDate(), bankAccount.getPassword())
+                .orElseThrow(() -> new NotFoundException("there is no bank account with this inputs"));
+    }
+
+
 }

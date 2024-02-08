@@ -42,11 +42,13 @@ public class Users extends BaseEntity<Long> implements Serializable {
     @ValidLocalDateTime
     LocalDateTime signupDate;
     @PrePersist
-    private void preparePassword() {
+    private void preparePasswordAndOthers() {
         if (password == null || password.isEmpty()) {
             PasswordGenerator generator = new PasswordGenerator(8);
             this.password = generator.nextPassword();
         }
+        this.signupDate = LocalDateTime.now();
     }
+
 
 }

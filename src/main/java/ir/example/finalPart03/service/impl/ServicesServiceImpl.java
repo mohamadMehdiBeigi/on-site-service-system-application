@@ -1,10 +1,11 @@
 package ir.example.finalPart03.service.impl;
 
+import ir.example.finalPart03.config.exceptions.BadRequestException;
+import ir.example.finalPart03.config.exceptions.DuplicateException;
 import ir.example.finalPart03.model.Services;
 import ir.example.finalPart03.repository.ServicesRepository;
 import ir.example.finalPart03.service.ServicesService;
 import ir.example.finalPart03.service.SubServiceService;
-import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +27,13 @@ public class ServicesServiceImpl implements ServicesService {
     public Services saveService(Services services) {
         try {
             if (!checkUniqueServiceName(services.getServiceName(), services.getId())) {
-                throw new ValidationException("Email already exists");
+                throw new DuplicateException("Email already exists");
             }
 
             return servicesRepository.save(services);
         } catch (Exception e) {
-            System.err.println("Can't save or update customer data: " + e.getMessage());
+            throw new BadRequestException("Can't save or update customer data: " + e.getMessage());
         }
-        return null;
     }
 
     @Override
@@ -41,12 +41,12 @@ public class ServicesServiceImpl implements ServicesService {
         if (serviceIdForUpdate == null) {
             Integer checked = servicesRepository.checkUniqueServiceNameForNewServices(serviceName);
             if (checked > 0) {
-                throw new RuntimeException("The serviceName you entered is already exist. Try another serviceName.");
+                throw new DuplicateException("The serviceName you entered is already exist. Try another serviceName.");
             }
         } else {
             Integer checked = servicesRepository.checkUniqueServiceNameForExistingServices(serviceName, serviceIdForUpdate);
             if (checked > 0) {
-                throw new RuntimeException("The serviceName you entered is already used");
+                throw new DuplicateException("The serviceName you entered is already used");
             }
         }
         return true;
@@ -58,7 +58,7 @@ public class ServicesServiceImpl implements ServicesService {
             subServiceService.removeSubServiceByServiceId(serviceId);
             servicesRepository.deleteById(serviceId);
         } catch (Exception e){
-            throw new RuntimeException("cant delete service data,try again.");
+            throw new BadRequestException("cant delete service data,try again.");
         }
     }
 }
