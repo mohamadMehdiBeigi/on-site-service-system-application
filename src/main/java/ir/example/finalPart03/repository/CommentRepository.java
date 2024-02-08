@@ -13,7 +13,7 @@ public interface CommentRepository extends JpaRepository<Comments, Long> {
     @Query(nativeQuery = true, value =
             "select c.* " +
                     "from final_part3.comments c " +
-                    "join final_part3.\"order\" o on c.id = o.comments_id " +
+                    "join final_part3.\"order\" o on o.id = c.order_id " +
                     "join final_part3.sub_services ss on ss.id = o.sub_services_id " +
                     "join final_part3.users_sub_services uss on ss.id = uss.sub_service_id " +
                     "join final_part3.users u on u.id = uss.user_id " +

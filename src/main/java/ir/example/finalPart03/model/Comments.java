@@ -13,10 +13,10 @@ import org.hibernate.validator.constraints.Range;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+//@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Entity
 @SuperBuilder
 @ToString
@@ -30,8 +30,40 @@ public class Comments extends BaseEntity<Long> implements Serializable {
 
     String comment;
 
-    @OneToOne(mappedBy = "comments")
+    @OneToOne
     Order order;
 
+    public Comments(Long aLong, Double score, String comment, Order order) {
+        super(aLong);
+        this.score = score;
+        this.comment = comment;
+        this.order = order;
+    }
 
+    public Comments() {
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }

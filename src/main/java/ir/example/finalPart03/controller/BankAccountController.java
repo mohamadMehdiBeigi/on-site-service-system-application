@@ -1,21 +1,25 @@
 package ir.example.finalPart03.controller;
 
 import ir.example.finalPart03.dto.bankAccountDto.BankAccountRequestDto;
+import ir.example.finalPart03.dto.bankAccountDto.BankAccountResponseDto;
+import ir.example.finalPart03.dto.bankAccountDto.BankAccountSavingDto;
 import ir.example.finalPart03.model.BankAccount;
 import ir.example.finalPart03.service.BankAccountService;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/payment-getaway")
+@AllArgsConstructor
 public class BankAccountController {
 
     private BankAccountService bankAccountService;
 
-    public BankAccountController(BankAccountService bankAccountService) {
-        this.bankAccountService = bankAccountService;
-    }
+    private ModelMapper modelMapper;
+
 
     @PutMapping("/credit/{customerId}/{specialistId}/{paymentAmount}")
     public ResponseEntity<Void> orderPaymentByCustomerFromCredit(@PathVariable Long customerId, @PathVariable Long specialistId, @PathVariable Double paymentAmount) {
@@ -31,8 +35,11 @@ public class BankAccountController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<BankAccount> saveBankAccount(@RequestBody BankAccount bankAccount) {
-        return new ResponseEntity<>(bankAccountService.saveBankAccount(bankAccount), HttpStatus.CREATED);
+    public ResponseEntity<BankAccountResponseDto> saveBankAccount(@RequestBody BankAccountSavingDto bankAccountSavingDto) {
+        BankAccount bankAccount = BankAccountSavingDto.dtoToBankAccount(bankAccountSavingDto);
+        BankAccount saveBankAccount = bankAccountService.saveBankAccount(bankAccount, bankAccountSavingDto.getSpecialistId(), bankAccountSavingDto.getCustomerId());
+        BankAccountResponseDto bankAccountResponseDto = modelMapper.map(saveBankAccount, BankAccountResponseDto.class);
+        return new ResponseEntity<>(bankAccountResponseDto, HttpStatus.CREATED);
     }
 
 //    @GetMapping("/payment/{orderId}/{price}/{specialistId}")

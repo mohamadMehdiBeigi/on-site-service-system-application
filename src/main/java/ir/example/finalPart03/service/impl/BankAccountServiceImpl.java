@@ -47,12 +47,9 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public void finalPaymentByCustomerFromCredit(Long customerId, Long specialistId, Double paymentAmount) {
-        try {
-            Double payment = orderPaymentByCustomerFromCredit(customerId, paymentAmount);
-            depositToSpecialistBalance(specialistId, payment);
-        } catch (Exception e) {
-            throw new BadRequestException("invalid customer or specialist id" + e.getMessage());
-        }
+        Double payment = orderPaymentByCustomerFromCredit(customerId, paymentAmount);
+        depositToSpecialistBalance(specialistId, payment);
+
     }
 
     @Override
@@ -73,12 +70,14 @@ public class BankAccountServiceImpl implements BankAccountService {
     private Double orderPaymentByCustomerFromCredit(Long customerId, Double paymentAmount) {
         BankAccount bankAccount = bankAccountRepository.findByCustomerId(customerId)
                 .orElseThrow(() -> new RuntimeException("this customer id is not exist"));
-        try {
-            double remainingCredit = bankAccount.getBalance() - paymentAmount;
 
-            if (remainingCredit < 0) {
-                throw new BadRequestException("you dont have enough money on your credit, please charge your account or select <OnlinePayment>");
-            }
+        double bankAccountBalance = bankAccount.getBalance();
+
+        if (bankAccountBalance < paymentAmount) {
+            throw new BadRequestException("you dont have enough money on your credit, please charge your account or select <OnlinePayment>");
+        }
+        try {
+            double remainingCredit = bankAccountBalance - paymentAmount;
             bankAccount.setBalance(remainingCredit);
             bankAccountRepository.save(bankAccount);
             return remainingCredit;

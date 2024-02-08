@@ -2,7 +2,9 @@ package ir.example.finalPart03.service.impl;
 
 import ir.example.finalPart03.config.exceptions.BadRequestException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
+import ir.example.finalPart03.model.Customer;
 import ir.example.finalPart03.model.Order;
+import ir.example.finalPart03.model.SubServices;
 import ir.example.finalPart03.model.enums.OrderStatus;
 import ir.example.finalPart03.repository.OrderRepository;
 import ir.example.finalPart03.service.OrderService;
@@ -26,7 +28,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public Order saveOrder(Order order, Double basePrice) {
+    public Order saveOrder(Order order, Double basePrice, Long subServicesId, Long customerId) {
         if (order.getSuggestedPrice() < basePrice) {
             throw new BadRequestException("suggested price is less than base price ");
         }
@@ -34,6 +36,16 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("your start day of work is before current date and time");
         }
         try {
+            if (order.getOrderStatus() == null && subServicesId != null){
+                SubServices subServices = new SubServices();
+                subServices.setId(subServicesId);
+                order.setSubServices(subServices);
+            }
+            if (order.getOrderStatus() == null && customerId != null){
+                Customer customer = new Customer();
+                customer.setId(customerId);
+                order.setCustomer(customer);
+            }
             orderRepository.save(order);
         } catch (Exception e) {
             throw new BadRequestException("cant save Order" + e.getMessage());

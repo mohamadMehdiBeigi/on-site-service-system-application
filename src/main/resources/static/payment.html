@@ -156,6 +156,25 @@
                 alert('An error occurred: ' + error.message);
             });
     });
+
+    var deadline = new Date();
+    deadline.setMinutes(deadline.getMinutes() + 10);
+
+    var x = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = deadline - now;
+
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("ten-countdown").innerHTML = minutes + "m " + seconds + "s ";
+
+        if (distance < 0) {
+            clearInterval(x);
+            document.getElementById("ten-countdown").innerHTML = "EXPIRED";
+            document.getElementById("submit").disabled = true;
+        }
+    }, 1000);
 </script>
 </body>
 </html>

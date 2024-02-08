@@ -22,11 +22,10 @@ public class OrderController {
     private ModelMapper modelMapper;
 
 
-    @PostMapping("/saveOrder")
-    public ResponseEntity<OrderResponseDto> saveOrder(@RequestBody OrderRequestDto orderRequestDto) {
+    @PostMapping("/saveOrder/{subServiceBasePrice}")
+    public ResponseEntity<OrderResponseDto> saveOrder(@RequestBody OrderRequestDto orderRequestDto, @PathVariable Double subServiceBasePrice) {
         Order orderMapper = modelMapper.map(orderRequestDto, Order.class);
-
-        Order order = orderService.saveOrder(orderMapper, orderMapper.getSubServices().getBasePrice());
+        Order order = orderService.saveOrder(orderMapper, subServiceBasePrice, orderRequestDto.getSubServicesId(), orderRequestDto.getCustomerId());
         OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
         return new ResponseEntity<>(orderResponseDto, HttpStatus.CREATED);
     }

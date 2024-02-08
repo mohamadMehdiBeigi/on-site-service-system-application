@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    Order saveOrder(Order order, Double basePrice);
+    Order saveOrder(Order order, Double basePrice, Long subServicesId, Long customerId);
 
     Order findById(Long id);
 

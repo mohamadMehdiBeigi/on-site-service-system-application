@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CommentService {
 
-    Comments saveComment(Comments comments);
+    Comments saveComment(Comments comments, Long orderId);
 
     List<Comments> findAllBySpecialistId(Long specialistId);
 

@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
-public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
+public interface
+BankAccountRepository extends JpaRepository<BankAccount, Long> {
 
     @Query(" from BankAccount b where b.customer.id =:customerId")
     Optional<BankAccount> findByCustomerId(Long customerId);

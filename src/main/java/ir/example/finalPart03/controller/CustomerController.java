@@ -1,8 +1,11 @@
 package ir.example.finalPart03.controller;
 
+import ir.example.finalPart03.dto.customerDto.CustomerRequestDto;
+import ir.example.finalPart03.dto.customerDto.CustomerResponseDto;
 import ir.example.finalPart03.model.Customer;
 import ir.example.finalPart03.service.CustomerService;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +17,24 @@ public class CustomerController {
 
     private CustomerService customerService;
 
+    private ModelMapper modelMapper;
+
     @PostMapping("/customer/save")
-    ResponseEntity<Customer> saveCustomer(@RequestBody Customer customer) {
-        return new ResponseEntity<>(customerService.saveCustomer(customer), HttpStatus.CREATED);
+    ResponseEntity<CustomerResponseDto> saveCustomer(@RequestBody CustomerRequestDto customerRequestDto) {
+        Customer customer = modelMapper.map(customerRequestDto, Customer.class);
+        Customer savedCustomer = customerService.saveCustomer(customer);
+        CustomerResponseDto customerResponseDto = modelMapper.map(savedCustomer, CustomerResponseDto.class);
+
+        return new ResponseEntity<>(customerResponseDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/login/customer/{email}/{password}")
-    public ResponseEntity<Customer> findByEmailAndPassword(@PathVariable String email, @PathVariable String password) {
-        return new ResponseEntity<>(customerService.findByEmailAndPassword(email, password), HttpStatus.OK);
+    public ResponseEntity<CustomerResponseDto> findByEmailAndPassword(@PathVariable String email, @PathVariable String password) {
+
+        Customer byEmailAndPassword = customerService.findByEmailAndPassword(email, password);
+        CustomerResponseDto customerResponseDto = modelMapper.map(byEmailAndPassword, CustomerResponseDto.class);
+
+        return new ResponseEntity<>(customerResponseDto, HttpStatus.OK);
     }
 
     @PutMapping("/customer/changePassword/{customerId}/{password}/{confirmingPassword}")

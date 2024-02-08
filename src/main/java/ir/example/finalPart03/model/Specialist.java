@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
@@ -14,10 +15,9 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @SuperBuilder
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
-public class Specialist extends Users {
+public class Specialist extends Users implements Serializable {
 
     @Enumerated(value = EnumType.STRING)
     SpecialistStatus specialistStatus;

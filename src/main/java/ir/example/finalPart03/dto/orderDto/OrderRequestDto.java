@@ -1,34 +1,23 @@
 package ir.example.finalPart03.dto.orderDto;
 
-import ir.example.finalPart03.model.Comments;
-import ir.example.finalPart03.model.Customer;
-import ir.example.finalPart03.model.SubServices;
-
 import java.time.LocalDateTime;
 
 public class OrderRequestDto {
+
     private Double suggestedPrice;
 
-    String workDescription;
+    private String workDescription;
 
-    LocalDateTime startDayOfWork;
+    private LocalDateTime startDayOfWork;
 
-    String address;
+    private String address;
 
-    SubServices subServices;
+    private Long subServicesId;
 
-    Customer customer;
+    private Long customerId;
 
-    Comments comments;
 
-    public OrderRequestDto(Double suggestedPrice, String workDescription, LocalDateTime startDayOfWork, String address, SubServices subServices, Customer customer, Comments comments) {
-        this.suggestedPrice = suggestedPrice;
-        this.workDescription = workDescription;
-        this.startDayOfWork = startDayOfWork;
-        this.address = address;
-        this.subServices = subServices;
-        this.customer = customer;
-        this.comments = comments;
+    public OrderRequestDto() {
     }
 
     public Double getSuggestedPrice() {
@@ -63,27 +52,19 @@ public class OrderRequestDto {
         this.address = address;
     }
 
-    public SubServices getSubServices() {
-        return subServices;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setSubServices(SubServices subServices) {
-        this.subServices = subServices;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public Long getSubServicesId() {
+        return subServicesId;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public Comments getComments() {
-        return comments;
-    }
-
-    public void setComments(Comments comments) {
-        this.comments = comments;
+    public void setSubServicesId(Long subServicesId) {
+        this.subServicesId = subServicesId;
     }
 }
