@@ -145,4 +145,11 @@ public class SpecialistServiceImpl implements SpecialistService {
             throw new BadRequestException("cant set average score to specialist,try again" + e.getMessage());
         }
     }
+
+    @Override
+    public Specialist findById(Long specialistId) {
+        return specialistRepository.findById(specialistId)
+                .orElseThrow(() -> new NotFoundException("cant find specialist,wrong specialistId"));
+
+    }
 }

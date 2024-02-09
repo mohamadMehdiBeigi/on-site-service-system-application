@@ -28,15 +28,6 @@ public class CustomerController {
         return new ResponseEntity<>(customerResponseDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("/login/customer/{email}/{password}")
-    public ResponseEntity<CustomerResponseDto> findByEmailAndPassword(@PathVariable String email, @PathVariable String password) {
-
-        Customer byEmailAndPassword = customerService.findByEmailAndPassword(email, password);
-        CustomerResponseDto customerResponseDto = modelMapper.map(byEmailAndPassword, CustomerResponseDto.class);
-
-        return new ResponseEntity<>(customerResponseDto, HttpStatus.OK);
-    }
-
     @PutMapping("/customer/changePassword/{customerId}/{password}/{confirmingPassword}")
     ResponseEntity<Void> changePassword(@PathVariable Long customerId, @PathVariable String password, @PathVariable String confirmingPassword) {
         customerService.changePassword(customerId, password, confirmingPassword);

@@ -80,8 +80,18 @@ public class OrderController {
         return ResponseEntity.ok(orderResponseDto);
     }
 
+    @PutMapping("/changeOrderStatusToPaid/{orderId}/{customerId}")
+    public ResponseEntity<OrderResponseDto> changeOrderStatusToPaid(@PathVariable Long orderId,@PathVariable Long customerId){
+        Order order = orderService.changeOrderStatusToPaid(orderId, customerId);
+        OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
+        return ResponseEntity.ok(orderResponseDto);
+    }
 
-
+    @PostMapping("/checkOrdersAndUpdateScores/{suggestionId}/{specialistId}")
+    public ResponseEntity<Void> checkOrdersAndUpdateScores(@PathVariable Long suggestionId,@PathVariable Long specialistId){
+        orderService.checkOrdersAndUpdateScores(suggestionId, specialistId);
+        return ResponseEntity.ok().build();
+    }
 
 
 }

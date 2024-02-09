@@ -1,13 +1,16 @@
 package ir.example.finalPart03.controller;
 
-import ir.example.finalPart03.dto.criteriaSearchDto.CriteriaSearchDto;
-import ir.example.finalPart03.model.Admin;
+import ir.example.finalPart03.dto.customerDto.CustomerResponseDto;
+import ir.example.finalPart03.dto.specialistDto.SpecialistResponseDto;
+import ir.example.finalPart03.model.Customer;
 import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.service.AdminService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,21 +26,28 @@ public class AdminController {
     private ModelMapper modelMapper;
 
 
-    @GetMapping("/login/admin/{email}/{password}")
-    public ResponseEntity<Admin> findByEmailAndPassword(@PathVariable String email, @PathVariable String password) {
-        return ResponseEntity.accepted().body(adminService.findByEmailAndPassword(email, password));
-    }
-
     @PostMapping("/admin/findAllSpecialistsByCriteria")
     //firstname - lastname - email - specialistField(select a serviceName) - averageScoresOrderBy(asc or desc)
-    public List<CriteriaSearchDto> findAllSpecialistsByCriteria(@RequestBody Map<String, String> param) {
+    public List<SpecialistResponseDto> findAllSpecialistsByCriteria(@RequestBody Map<String, String> param) {
 
-        List<CriteriaSearchDto> criteriaSearchDtoList = new ArrayList<>();
+        List<SpecialistResponseDto> criteriaSearchDtoList = new ArrayList<>();
         List<Specialist> allSpecialistsByCriteria = adminService.findAllSpecialistsByCriteria(param);
         for (Specialist s : allSpecialistsByCriteria
         ) {
-            CriteriaSearchDto criteriaSearchDto = modelMapper.map(s, CriteriaSearchDto.class);
-            criteriaSearchDtoList.add(criteriaSearchDto);
+            SpecialistResponseDto specialistResponseDto = modelMapper.map(s, SpecialistResponseDto.class);
+            criteriaSearchDtoList.add(specialistResponseDto);
+        }
+        return criteriaSearchDtoList;
+    }
+
+    @PostMapping("/admin/findAllCustomerByCriteria")
+    public List<CustomerResponseDto> findAllCustomerByCriteria(@RequestBody Map<String, String> param) {
+        List<CustomerResponseDto> criteriaSearchDtoList = new ArrayList<>();
+        List<Customer> allCustomerByCriteria = adminService.findAllCustomerByCriteria(param);
+        for (Customer s : allCustomerByCriteria
+        ) {
+            CustomerResponseDto customerResponseDto = modelMapper.map(s, CustomerResponseDto.class);
+            criteriaSearchDtoList.add(customerResponseDto);
         }
         return criteriaSearchDtoList;
     }

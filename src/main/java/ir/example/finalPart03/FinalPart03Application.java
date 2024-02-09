@@ -1,6 +1,5 @@
 package ir.example.finalPart03;
 
-import ir.example.finalPart03.service.AdminService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -10,7 +9,7 @@ public class FinalPart03Application {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(FinalPart03Application.class, args);
 
-        AdminService adminService = run.getBean(AdminService.class);
+//        AdminService adminService = run.getBean(AdminService.class);
 
 //        System.out.println(adminService.findAllSpecialistsByCriteria("peciali", null, null, null, null));
 //        System.out.println(adminService.findAllCustomerByCriteria("ust", null, null));
@@ -73,6 +72,8 @@ public class FinalPart03Application {
 //        System.out.println(orderService.findAvailableOrdersForSpecialist(77L));
 //        orderService.findAllByOrderStatusAndSpecialistId(77L);
 //        suggestionService.findAllByCustomerIdOrOrderByTotalScores(77L);
+//        Specialist byId = specialistService.findById(2L);
+//        System.out.println(byId.getAverageScores());
 
     }
 }

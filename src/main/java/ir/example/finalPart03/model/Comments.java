@@ -19,7 +19,6 @@ import java.io.Serializable;
 //@NoArgsConstructor
 @Entity
 @SuperBuilder
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 public class Comments extends BaseEntity<Long> implements Serializable {

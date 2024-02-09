@@ -35,12 +35,6 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    @Override
-    public Customer findByEmailAndPassword(String email, String password) {
-        return customerRepository.findByEmailAndPassword(email, password)
-                .orElseThrow(() -> new NotFoundException("this email is not found!"));
-    }
-
     @Transactional
     @Override
     public void changePassword(Long id, String password, String confirmingPassword) {

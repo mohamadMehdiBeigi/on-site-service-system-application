@@ -63,12 +63,6 @@ class SpecialistServiceImplTest {
     }
 
 
-    @Test
-    @Order(1)
-    void findByEmailAndPassword() {
-        Specialist byEmailAndPassword = specialistService.findByEmailAndPassword(savedSpecialist.getEmail(), savedSpecialist.getPassword());
-        assertNotNull(byEmailAndPassword, "this shouldn't be null");
-    }
 
     @Test
     @Order(2)

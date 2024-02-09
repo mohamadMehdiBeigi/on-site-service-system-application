@@ -21,4 +21,5 @@ public interface SpecialistService {
     Specialist seeAverageScore(Long specialistId);
 
 
+    Specialist findById(Long specialistId);
 }

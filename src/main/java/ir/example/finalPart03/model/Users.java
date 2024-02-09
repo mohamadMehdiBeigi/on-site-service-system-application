@@ -11,7 +11,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -24,7 +23,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Users extends BaseEntity<Long> implements Serializable {
+public class Users extends BaseEntity<Long> {
 
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "firstname must have been included just English alphabet")
     String firstname;
