@@ -11,10 +11,10 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+//@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Entity
 @SuperBuilder
 @ToString
@@ -25,4 +25,23 @@ public class Services extends BaseEntity<Long> implements Serializable {
     @Column(unique = true)
     String serviceName;
 
+    public Services() {
+    }
+
+    public Services(Long aLong, String serviceName) {
+        super(aLong);
+        this.serviceName = serviceName;
+    }
+
+    public Services(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 }

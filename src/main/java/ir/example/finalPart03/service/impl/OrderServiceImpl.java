@@ -2,31 +2,35 @@ package ir.example.finalPart03.service.impl;
 
 import ir.example.finalPart03.config.exceptions.BadRequestException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
-import ir.example.finalPart03.model.Customer;
-import ir.example.finalPart03.model.Order;
-import ir.example.finalPart03.model.SubServices;
+import ir.example.finalPart03.model.*;
 import ir.example.finalPart03.model.enums.OrderStatus;
+import ir.example.finalPart03.model.enums.SpecialistStatus;
 import ir.example.finalPart03.repository.OrderRepository;
+import ir.example.finalPart03.repository.SpecialistRepository;
+import ir.example.finalPart03.repository.SuggestionsRepository;
 import ir.example.finalPart03.service.OrderService;
 import jakarta.persistence.NoResultException;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-@Transactional(readOnly = true)
+@Transactional
 @Service
+@AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private OrderRepository orderRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
+    private SpecialistRepository specialistRepository;
 
-    @Transactional
+    private SuggestionsRepository suggestionsRepository;
+
+
     @Override
     public Order saveOrder(Order order, Double basePrice, Long subServicesId, Long customerId) {
         if (order.getSuggestedPrice() < basePrice) {
@@ -143,4 +147,82 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
 
     }
+
+
+//    public void changeStatusOfOrderByCustomerToFinish(Integer suggestionId, String timeOfFinishingWork) {
+//        Suggestions suggestion = suggestionRepository.findById(suggestionId)
+//                .orElseThrow(() -> new NotFoundException("i can not found this suggestion"));
+//
+//        String timeOfStartingWork = suggestion.getTimeOfStartingWork();
+//        String durationTimeOfWork = suggestion.getDurationTimeOfWork();
+//
+//        LocalDateTime startWorkTime = LocalDateTime.parse(timeOfStartingWork, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+//        LocalTime durationTime = LocalTime.parse(durationTimeOfWork, DateTimeFormatter.ofPattern("HH:mm:ss"));
+//
+//        LocalDateTime expectedFinishTime = startWorkTime
+//                .plusHours(durationTime.getHour())
+//                .plusMinutes(durationTime.getMinute())
+//                .plusSeconds(durationTime.getSecond());
+//
+//        LocalDateTime actualFinishTime = LocalDateTime.parse(timeOfFinishingWork, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//
+//        if (actualFinishTime.isAfter(expectedFinishTime)) {
+//            long delayHours = ChronoUnit.HOURS.between(expectedFinishTime, actualFinishTime);
+//            int ratingReduction = (int) delayHours;
+//
+//            Specialist specialist = suggestion.getSpecialist();
+//            Double currentRating = specialist.getAverageScores();
+//            Double updatedRating = Math.max(0, currentRating - ratingReduction);
+//
+//            if (updatedRating <= 0) {
+//                specialist.setSpecialistStatus(SpecialistStatus.NEW);
+//                specialistRepository.save(specialist);
+//                throw new BadRequestException("your account is disabled");
+//            } else {
+//                expert.setStars(updatedRating);
+//                expertRepository.save(expert);
+//            }
+//        }
+//
+//        CustomerOrder customerOrder = suggestion.getCustomerOrder();
+//        customerOrder.setStatusOfOrder(StatusOfOrder.DONE);
+//        customerOrderRepository.save(customerOrder);
+//    }
+
+
+
+
+    // Assume the score to deduct per hour of delay
+    private final Double SCORE_TO_DEDUCT_PER_HOUR = 1.0;
+
+    public void checkOrdersAndUpdateScores(Long specialistId) {
+        List<Order> startedOrders = orderRepository.findAllByOrderStatus(OrderStatus.STARTED);
+
+        for (Order order : startedOrders) {
+            LocalDateTime now = LocalDateTime.now();
+            // بررسی کردن زمان شروع کار و مقایسه با زمان کنونی
+            if (now.isAfter(order.getStartDayOfWork())) {
+                long hoursPassed = Duration.between(order.getStartDayOfWork(), now).toHours();
+                Suggestions suggestion = suggestionsRepository.findById(specialistId)
+                        .orElseThrow(() -> new NotFoundException("suggestion is not found"));
+//                Suggestions suggestion = findRelevantSuggestionForOrder(order); // پیدا کردن ساعت پیشنهادی برای شروع کار
+                if (suggestion != null) {
+                    long hoursOfWork = Math.round(suggestion.getDurationOfDailyWork());
+                    if (hoursPassed > hoursOfWork) {
+                        long delayInHours = hoursPassed - hoursOfWork;
+                        Specialist specialist = suggestion.getSpecialist();
+                        double newScore = specialist.getAverageScores() - (delayInHours * SCORE_TO_DEDUCT_PER_HOUR);
+                        if (newScore <= 0) {
+                            specialist.setSpecialistStatus(SpecialistStatus.NEW);
+                            throw new BadRequestException("specialist averageScore is zero and and specialist is off working");
+                        } else {
+                            specialist.setAverageScores(newScore);
+                            specialistRepository.save(specialist);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

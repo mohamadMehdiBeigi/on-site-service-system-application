@@ -3,6 +3,7 @@ package ir.example.finalPart03.service.impl;
 import ir.example.finalPart03.config.exceptions.BadRequestException;
 import ir.example.finalPart03.config.exceptions.DuplicateException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
+import ir.example.finalPart03.model.Services;
 import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.model.SubServices;
 import ir.example.finalPart03.repository.SpecialistRepository;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class SubServicesServiceImpl implements SubServiceService {
 
     private SubServicesRepository subServicesRepository;
@@ -29,21 +30,23 @@ public class SubServicesServiceImpl implements SubServiceService {
         this.specialistRepository = specialistRepository;
     }
 
-    @Transactional
     @Override
-    public SubServices saveSubService(SubServices subService) {
+    public SubServices saveSubService(SubServices subService, Long serviceId) {
         try {
             if (!checkUniqueSubServiceName(subService.getSubServiceName(), subService.getId())) {
                 throw new DuplicateException("Email already exists");
             }
-
+            if (subService.getServices() == null){
+                Services services = new Services();
+                services.setId(serviceId);
+                subService.setServices(services);
+            }
             return subServicesRepository.save(subService);
         } catch (Exception e) {
             throw new BadRequestException("cant save subService, invalid body input" + e.getMessage());
         }
     }
 
-    @Transactional
     @Override
     public SubServices updateBasePriceAndDescription(Long id, Double newBasePrice, String description) {
         SubServices subServices = subServicesRepository.findById(id)
@@ -95,13 +98,15 @@ public class SubServicesServiceImpl implements SubServiceService {
     @Override
     public void removeSubServiceByServiceId(Long serviceId) {
         try {
-            subServicesRepository.removeSubServiceRelationalByServiceId(serviceId);
+            List<SubServices> allByServicesId = subServicesRepository.findAllByServicesId(serviceId);
+            if (allByServicesId.size() != 0){
+                subServicesRepository.removeSubServiceRelationalByServiceId(serviceId);
+            }
         } catch (Exception e) {
             throw new RuntimeException("invalid serviceId, try with valid id" + e.getMessage());
         }
     }
 
-    @Transactional
     @Override
     public void deleteSubServicesOfSpecialist(Long specialistId) {
         Specialist specialist = specialistRepository.findById(specialistId)

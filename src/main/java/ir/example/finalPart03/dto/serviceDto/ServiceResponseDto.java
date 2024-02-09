@@ -11,6 +11,9 @@ public class ServiceResponseDto {
         this.serviceName = serviceName;
     }
 
+    public ServiceResponseDto() {
+    }
+
     public Long getId() {
         return id;
     }

@@ -50,7 +50,6 @@ class SubServicesServiceImplTest {
         specialist.setLastname("Doe");
         specialist.setEmail("john.doe" + RandomStringGenerator.randomGenerator() + "@example.com");
         specialist.setSignupDate(LocalDateTime.now());
-        specialist.setCredit(0.0);
         specialist.setSpecialistStatus(SpecialistStatus.WAIT_FOR_CONFIRMED);
 
         savedSpecialist = specialistRepository.save(specialist);
@@ -67,7 +66,7 @@ class SubServicesServiceImplTest {
                 services,
                 null
         );
-        savedSubService = subServiceService.saveSubService(subServices);
+        savedSubService = subServiceService.saveSubService(subServices, null);
     }
 
     @Test

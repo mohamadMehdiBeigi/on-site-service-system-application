@@ -29,11 +29,12 @@ public class SubServices extends BaseEntity<Long> implements Serializable {
 
     String description;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = CascadeType.REMOVE)
     Services services;
 
     @ManyToMany(mappedBy = "subServices", cascade = CascadeType.REMOVE)
     Set<Specialist> specialists;
+
 
 
     public SubServices(Long aLong, String subServiceName, Double basePrice, String description, Services services, Set<Specialist> specialists) {

@@ -14,10 +14,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+//@Getter
+//@Setter
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Entity
 @SuperBuilder
 @ToString
@@ -43,4 +43,65 @@ public class Suggestions extends BaseEntity<Long> implements Serializable {
 
     @ManyToOne
     Order order;
+
+
+    public Suggestions() {
+    }
+
+    public Suggestions(LocalDateTime suggestionsRegistrationDate, Double suggestedPrice, LocalDateTime suggestedTimeToStartWork, Double durationOfDailyWork, Specialist specialist, Order order) {
+        this.suggestionsRegistrationDate = suggestionsRegistrationDate;
+        SuggestedPrice = suggestedPrice;
+        this.suggestedTimeToStartWork = suggestedTimeToStartWork;
+        this.durationOfDailyWork = durationOfDailyWork;
+        this.specialist = specialist;
+        this.order = order;
+    }
+
+    public LocalDateTime getSuggestionsRegistrationDate() {
+        return suggestionsRegistrationDate;
+    }
+
+    public void setSuggestionsRegistrationDate(LocalDateTime suggestionsRegistrationDate) {
+        this.suggestionsRegistrationDate = suggestionsRegistrationDate;
+    }
+
+    public Double getSuggestedPrice() {
+        return SuggestedPrice;
+    }
+
+    public void setSuggestedPrice(Double suggestedPrice) {
+        SuggestedPrice = suggestedPrice;
+    }
+
+    public LocalDateTime getSuggestedTimeToStartWork() {
+        return suggestedTimeToStartWork;
+    }
+
+    public void setSuggestedTimeToStartWork(LocalDateTime suggestedTimeToStartWork) {
+        this.suggestedTimeToStartWork = suggestedTimeToStartWork;
+    }
+
+    public Double getDurationOfDailyWork() {
+        return durationOfDailyWork;
+    }
+
+    public void setDurationOfDailyWork(Double durationOfDailyWork) {
+        this.durationOfDailyWork = durationOfDailyWork;
+    }
+
+    public Specialist getSpecialist() {
+        return specialist;
+    }
+
+    public void setSpecialist(Specialist specialist) {
+        this.specialist = specialist;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }

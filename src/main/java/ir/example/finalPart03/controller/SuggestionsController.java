@@ -24,9 +24,10 @@ public class SuggestionsController {
 
     @PostMapping("/save")
     public ResponseEntity<SuggestionResponseDto> saveSuggestion(@RequestBody SuggestionRequestDto suggestionRequestDto) {
-        Suggestions suggestions = modelMapper.map(suggestionRequestDto, Suggestions.class);
+        Suggestions suggestions = SuggestionRequestDto.dtoToSuggestion(suggestionRequestDto);
         Suggestions saveSuggestion = suggestionService.saveSuggestion(suggestions, suggestionRequestDto.getOrderId(), suggestionRequestDto.getSpecialistId());
-        return new ResponseEntity<>(modelMapper.map(saveSuggestion, SuggestionResponseDto.class), HttpStatus.CREATED);
+        SuggestionResponseDto suggestionResponseDto = SuggestionResponseDto.suggestionToResponseDto(saveSuggestion);
+        return new ResponseEntity<>(suggestionResponseDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/findAllByCustomerIdOrOrderBySuggestedPrice/{customerId}")

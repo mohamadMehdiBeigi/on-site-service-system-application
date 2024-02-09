@@ -14,12 +14,10 @@ public class SubServiceRequestDto {
 
     private String description;
 
+    private Long serviceId;
 
-    public SubServiceRequestDto(String subServiceName, Double basePrice, String description) {
-        this.subServiceName = subServiceName;
-        this.basePrice = basePrice;
-        this.description = description;
 
+    public SubServiceRequestDto() {
     }
 
     public String getSubServiceName() {
@@ -46,4 +44,11 @@ public class SubServiceRequestDto {
         this.description = description;
     }
 
+    public Long getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(Long serviceId) {
+        this.serviceId = serviceId;
+    }
 }

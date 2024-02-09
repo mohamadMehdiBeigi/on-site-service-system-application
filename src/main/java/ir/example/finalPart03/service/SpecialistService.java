@@ -6,8 +6,6 @@ public interface SpecialistService {
 
     Specialist saveSpecialist(Specialist specialist);
 
-    Specialist findByEmailAndPassword(String email, String password);
-
     Boolean checkingSpecialistStatus(Long specialistId);
 
     void confirmingSpecialStatus(Long specialistId);
@@ -20,7 +18,6 @@ public interface SpecialistService {
 
     void addSubServiceToSpecialist(Long specialistId, Long subServiceId);
 
-    // ino yadet bashe bepors ba dto chejoori mishe
     Specialist seeAverageScore(Long specialistId);
 
 

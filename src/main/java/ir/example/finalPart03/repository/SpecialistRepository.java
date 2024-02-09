@@ -28,8 +28,8 @@ public interface SpecialistRepository extends JpaRepository<Specialist, Long> {
 
     @Query(nativeQuery = true, value =
             "select avg(comments.score) " +
-                    "from final_part3.comments " +
-                    "join final_part3.\"order\" o on comments.id = o.comments_id " +
+                    "from final_part3.comments  " +
+                    "join final_part3.\"order\" o on comments.order_id = o.id " +
                     "join final_part3.sub_services ss on ss.id = o.sub_services_id " +
                     "join final_part3.users_sub_services uss on ss.id = uss.sub_service_id " +
                     "join final_part3.users u on u.id = uss.user_id " +

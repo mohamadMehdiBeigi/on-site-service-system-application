@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SubServiceService {
 
-    SubServices saveSubService(SubServices subService);
+    SubServices saveSubService(SubServices subService, Long serviceId);
 
     SubServices updateBasePriceAndDescription(Long id, Double newBasePrice, String description);
 

@@ -25,7 +25,7 @@ public class SubServiceController {
     @PostMapping("/save")
     public ResponseEntity<SubServiceResponseDto> saveSubService(@RequestBody SubServiceRequestDto serviceRequestDto) {
         SubServices subServices = modelMapper.map(serviceRequestDto, SubServices.class);
-        SubServices saveSubService = subServiceService.saveSubService(subServices);
+        SubServices saveSubService = subServiceService.saveSubService(subServices, serviceRequestDto.getServiceId());
         SubServiceResponseDto subServiceResponseDto = modelMapper.map(saveSubService, SubServiceResponseDto.class);
         return new ResponseEntity<>(subServiceResponseDto, HttpStatus.CREATED);
 

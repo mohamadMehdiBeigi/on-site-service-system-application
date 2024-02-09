@@ -16,11 +16,7 @@ public class SubServiceResponseDto {
 
     private String description;
 
-    public SubServiceResponseDto(Long id, String subServiceName, Double basePrice, String description) {
-        this.id = id;
-        this.subServiceName = subServiceName;
-        this.basePrice = basePrice;
-        this.description = description;
+    public SubServiceResponseDto() {
     }
 
     public Long getId() {

@@ -30,14 +30,14 @@ public class OrderController {
         return new ResponseEntity<>(orderResponseDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("/findOrder{orderId}")
+    @GetMapping("/findOrder/{orderId}")
     public ResponseEntity<OrderResponseDto> findById(@PathVariable Long orderId) {
         Order order = orderService.findById(orderId);
         OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
         return ResponseEntity.ok(orderResponseDto);
     }
 
-    @GetMapping("/findAvailableOrdersForSpecialist{specialistId}")
+    @GetMapping("/findAvailableOrdersForSpecialist/{specialistId}")
     public ResponseEntity<List<OrderResponseDto>> findAvailableOrdersForSpecialist(@PathVariable Long specialistId) {
         List<Order> availableOrdersForSpecialist = orderService.findAvailableOrdersForSpecialist(specialistId);
         List<OrderResponseDto> orderResponseDtoList = new ArrayList<>();
@@ -48,7 +48,7 @@ public class OrderController {
         return ResponseEntity.ok(orderResponseDtoList);
     }
 
-    @GetMapping("/findAllByOrderStatusAndSpecialistId{specialistId}")
+    @GetMapping("/findAllByOrderStatusAndSpecialistId/{specialistId}")
     public ResponseEntity<List<OrderResponseDto>> findAllByOrderStatusAndSpecialistId(@PathVariable Long specialistId) {
         List<Order> allByOrderStatusAndSpecialistId = orderService.findAllByOrderStatusAndSpecialistId(specialistId);
         List<OrderResponseDto> orderResponseDtosList = new ArrayList<>();
@@ -59,21 +59,21 @@ public class OrderController {
         return ResponseEntity.ok(orderResponseDtosList);
     }
 
-    @PutMapping("/changeOrderStatusToComingToYourPlace{orderId}")
+    @PutMapping("/changeOrderStatusToComingToYourPlace/{orderId}")
     public ResponseEntity<OrderResponseDto> changeOrderStatusToComingToYourPlace(@PathVariable Long orderId){
         Order order = orderService.changeOrderStatusToComingToYourPlace(orderId);
         OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
         return ResponseEntity.ok(orderResponseDto);
     }
 
-    @PutMapping("/changeOrderStatusToStarted{orderId}/{customerId}")
+    @PutMapping("/changeOrderStatusToStarted/{orderId}/{customerId}")
     public ResponseEntity<OrderResponseDto> changeOrderStatusToStartedByCustomer(@PathVariable Long orderId, @PathVariable Long customerId){
         Order order = orderService.changeOrderStatusToStartedByCustomer(orderId, customerId);
         OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
         return ResponseEntity.ok(orderResponseDto);
     }
 
-    @PutMapping("/changeOrderStatusToDone{orderId}/{customerId}")
+    @PutMapping("/changeOrderStatusToDone/{orderId}/{customerId}")
     public ResponseEntity<OrderResponseDto> changeOrderStatusToDone(@PathVariable Long orderId, @PathVariable Long customerId){
         Order order = orderService.changeOrderStatusToDone(orderId, customerId);
         OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);

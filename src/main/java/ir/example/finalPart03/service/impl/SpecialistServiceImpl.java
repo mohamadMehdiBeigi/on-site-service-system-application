@@ -46,13 +46,6 @@ public class SpecialistServiceImpl implements SpecialistService {
     }
 
     @Override
-    public Specialist findByEmailAndPassword(String email, String password) {
-        return specialistRepository.findByEmailAndPassword(email, password)
-                .orElseThrow(() -> new NotFoundException("this email is not found!"));
-
-    }
-
-    @Override
     public Boolean checkingSpecialistStatus(Long specialistId) {
         Specialist specialist = specialistRepository.findById(specialistId)
                 .orElseThrow(() -> new NotFoundException("Specialist with ID: " + specialistId + " was not found."));
@@ -64,10 +57,13 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Transactional
     @Override
     public void confirmingSpecialStatus(Long specialistId) {
+        Specialist specialist = specialistRepository.findById(specialistId)
+                .orElseThrow(() -> new NotFoundException("cant find anything whit this id."));
+        if (checkingSpecialistStatus(specialistId)) {
+            throw new BadRequestException("this account is already CONFIRMED");
+        }
+        specialist.setSpecialistStatus(SpecialistStatus.CONFIRMED);
         try {
-            Specialist specialist = specialistRepository.findById(specialistId)
-                    .orElseThrow(() -> new NotFoundException("cant find anything whit this id."));
-            specialist.setSpecialistStatus(SpecialistStatus.CONFIRMED);
             specialistRepository.save(specialist);
         } catch (Exception e) {
             throw new BadRequestException("there is problem with updating specialistStatus" + e.getMessage());

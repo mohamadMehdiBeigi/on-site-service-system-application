@@ -9,7 +9,7 @@ import ir.example.finalPart03.service.SubServiceService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
+@Transactional
 @Service
 public class ServicesServiceImpl implements ServicesService {
 
@@ -22,7 +22,6 @@ public class ServicesServiceImpl implements ServicesService {
         this.subServiceService = subServiceService;
     }
 
-    @Transactional
     @Override
     public Services saveService(Services services) {
         try {
@@ -54,10 +53,10 @@ public class ServicesServiceImpl implements ServicesService {
 
     @Override
     public void deleteServiceById(Long serviceId) {
+        subServiceService.removeSubServiceByServiceId(serviceId);
         try {
-            subServiceService.removeSubServiceByServiceId(serviceId);
             servicesRepository.deleteById(serviceId);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new BadRequestException("cant delete service data,try again.");
         }
     }

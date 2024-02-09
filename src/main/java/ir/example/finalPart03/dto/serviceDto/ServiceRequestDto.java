@@ -8,6 +8,9 @@ public class ServiceRequestDto {
         this.serviceName = serviceName;
     }
 
+    public ServiceRequestDto() {
+    }
+
     public String getServiceName() {
         return serviceName;
     }
@@ -15,4 +18,6 @@ public class ServiceRequestDto {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
+
+
 }

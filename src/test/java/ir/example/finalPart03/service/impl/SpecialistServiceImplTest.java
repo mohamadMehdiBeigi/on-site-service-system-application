@@ -50,7 +50,6 @@ class SpecialistServiceImplTest {
         specialist.setLastname("Doe");
         specialist.setEmail("john.doe" + RandomStringGenerator.randomGenerator() + "@example.com");
         specialist.setSignupDate(LocalDateTime.now());
-        specialist.setCredit(0.0);
         specialist.setSpecialistStatus(SpecialistStatus.WAIT_FOR_CONFIRMED);
         String filePath = "C:\\Users\\Data\\Pictures\\l.jpg";
         specialist.setImage(ImageReader

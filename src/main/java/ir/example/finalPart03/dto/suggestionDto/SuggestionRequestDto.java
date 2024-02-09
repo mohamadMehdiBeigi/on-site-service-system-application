@@ -1,17 +1,25 @@
 package ir.example.finalPart03.dto.suggestionDto;
 
+import ir.example.finalPart03.model.Suggestions;
 import ir.example.finalPart03.util.validations.ValidLocalDateTime;
 import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class SuggestionRequestDto {
 
     @ValidLocalDateTime
     private LocalDateTime suggestionsRegistrationDate;
 
-    @Min(value = 0, message = "price cant be lower than zero")
-    private Double SuggestedPrice;
+    private Double suggestedPrice;
 
     @ValidLocalDateTime
     private LocalDateTime suggestedTimeToStartWork;
@@ -23,63 +31,18 @@ public class SuggestionRequestDto {
 
     private Long orderId;
 
-    public SuggestionRequestDto(LocalDateTime suggestionsRegistrationDate, Double suggestedPrice, LocalDateTime suggestedTimeToStartWork, Double durationOfDailyWork, Long specialistId, Long orderId) {
-        this.suggestionsRegistrationDate = suggestionsRegistrationDate;
-        SuggestedPrice = suggestedPrice;
-        this.suggestedTimeToStartWork = suggestedTimeToStartWork;
-        this.durationOfDailyWork = durationOfDailyWork;
-        this.specialistId = specialistId;
-        this.orderId = orderId;
-    }
 
-    public SuggestionRequestDto() {
+    public static Suggestions dtoToSuggestion(SuggestionRequestDto suggestionRequestDto){
+        Suggestions suggestions = new Suggestions();
+        suggestions.setSuggestedPrice(suggestionRequestDto.getSuggestedPrice());
+        suggestions.setSuggestionsRegistrationDate(suggestionRequestDto.getSuggestionsRegistrationDate());
+        suggestions.setSuggestedTimeToStartWork(suggestionRequestDto.getSuggestedTimeToStartWork());
+        suggestions.setDurationOfDailyWork(suggestionRequestDto.getDurationOfDailyWork());
+        return suggestions;
     }
+//                    suggestionRequestDto.getSuggestionsRegistrationDate(),
+//                            suggestionRequestDto.getSuggestedPrice(),
+//                            suggestionRequestDto.getSuggestedTimeToStartWork(),
+//                            suggestionRequestDto.getDurationOfDailyWork(),
 
-    public LocalDateTime getSuggestionsRegistrationDate() {
-        return suggestionsRegistrationDate;
-    }
-
-    public void setSuggestionsRegistrationDate(LocalDateTime suggestionsRegistrationDate) {
-        this.suggestionsRegistrationDate = suggestionsRegistrationDate;
-    }
-
-    public Double getSuggestedPrice() {
-        return SuggestedPrice;
-    }
-
-    public void setSuggestedPrice(Double suggestedPrice) {
-        SuggestedPrice = suggestedPrice;
-    }
-
-    public LocalDateTime getSuggestedTimeToStartWork() {
-        return suggestedTimeToStartWork;
-    }
-
-    public void setSuggestedTimeToStartWork(LocalDateTime suggestedTimeToStartWork) {
-        this.suggestedTimeToStartWork = suggestedTimeToStartWork;
-    }
-
-    public Double getDurationOfDailyWork() {
-        return durationOfDailyWork;
-    }
-
-    public void setDurationOfDailyWork(Double durationOfDailyWork) {
-        this.durationOfDailyWork = durationOfDailyWork;
-    }
-
-    public Long getSpecialistId() {
-        return specialistId;
-    }
-
-    public void setSpecialistId(Long specialistId) {
-        this.specialistId = specialistId;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
 }
