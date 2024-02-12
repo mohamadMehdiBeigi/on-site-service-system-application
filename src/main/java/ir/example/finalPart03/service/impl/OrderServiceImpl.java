@@ -152,12 +152,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public Order changeOrderStatusToPaid(Long orderId, Long customerId) {
-        Order order = orderRepository.findByIdAndCustomerId(orderId, customerId)
-                .orElseThrow(() -> new NotFoundException("invalid order id or customer Id,choose an existing id"));
-        if (!Objects.equals(order.getOrderStatus(), OrderStatus.DONE)) {
-            throw new BadRequestException("your previous order status is not <DONE>");
-        }
+    public Order changeOrderStatusToPaid(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("this order id is not found!"));
         order.setOrderStatus(OrderStatus.PAID);
 
         return orderRepository.save(order);
@@ -167,34 +164,39 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void checkOrdersAndUpdateScores(Long suggestionId, Long specialistId) {
-        List<Order> startedOrders = orderRepository.findAllByOrderStatus(OrderStatus.STARTED);
+        try {
 
-        for (Order order : startedOrders) {
-            LocalDateTime now = LocalDateTime.now();
-            if (now.isAfter(order.getStartDayOfWork())) {
-                long hoursPassed = Duration.between(order.getStartDayOfWork(), now).toHours();
-                Suggestions suggestion = suggestionsRepository.findById(suggestionId)
-                        .orElseThrow(() -> new NotFoundException("suggestion is not found"));
+            List<Order> startedOrders = orderRepository.findAllByOrderStatus(OrderStatus.STARTED);
+
+            for (Order order : startedOrders) {
+                LocalDateTime now = LocalDateTime.now();
+                if (now.isAfter(order.getStartDayOfWork())) {
+                    long hoursPassed = Duration.between(order.getStartDayOfWork(), now).toHours();
+                    Suggestions suggestion = suggestionsRepository.findById(suggestionId)
+                            .orElseThrow(() -> new NotFoundException("suggestion is not found"));
 //                Suggestions suggestion = findRelevantSuggestionForOrder(order);
-                if (suggestion != null) {
-                    long hoursOfWork = Math.round(suggestion.getDurationOfDailyWork());
-                    if (hoursPassed > hoursOfWork) {
-                        long delayInHours = hoursPassed - hoursOfWork;
-                        Specialist specialist = specialistService.findById(specialistId);
-                        // Assume the score to deduct per hour of delay
-                        double SCORE_TO_DEDUCT_PER_HOUR = 1.0;
-                        double newScore = specialist.getAverageScores() - (delayInHours * SCORE_TO_DEDUCT_PER_HOUR);
-                        if (newScore <= 0) {
-                            specialist.setSpecialistStatus(SpecialistStatus.NEW);
-                            specialist.setAverageScores(0.0);
-                            specialistRepository.save(specialist);
-                        } else {
-                            specialist.setAverageScores(newScore);
-                            specialistRepository.save(specialist);
+                    if (suggestion != null) {
+                        long hoursOfWork = Math.round(suggestion.getDurationOfDailyWork());
+                        if (hoursPassed > hoursOfWork) {
+                            long delayInHours = hoursPassed - hoursOfWork;
+                            Specialist specialist = specialistService.findById(specialistId);
+                            // Assume the score to deduct per hour of delay
+                            double SCORE_TO_DEDUCT_PER_HOUR = 1.0;
+                            double newScore = specialist.getAverageScores() - (delayInHours * SCORE_TO_DEDUCT_PER_HOUR);
+                            if (newScore <= 0) {
+                                specialist.setSpecialistStatus(SpecialistStatus.NEW);
+                                specialist.setAverageScores(0.0);
+                                specialistRepository.save(specialist);
+                            } else {
+                                specialist.setAverageScores(newScore);
+                                specialistRepository.save(specialist);
+                            }
                         }
                     }
                 }
             }
+        } catch (Exception e) {
+            throw new BadRequestException("bad data for checkOrdersAndUpdateScores");
         }
     }
 

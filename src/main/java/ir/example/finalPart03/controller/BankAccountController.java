@@ -21,16 +21,16 @@ public class BankAccountController {
     private ModelMapper modelMapper;
 
 
-    @PutMapping("/credit/{customerId}/{specialistId}/{paymentAmount}")
-    public ResponseEntity<Void> orderPaymentByCustomerFromCredit(@PathVariable Long customerId, @PathVariable Long specialistId, @PathVariable Double paymentAmount) {
-        bankAccountService.finalPaymentByCustomerFromCredit(customerId, specialistId, paymentAmount);
+    @PutMapping("/credit/{customerId}/{specialistId}/{paymentAmount}/{orderId}")
+    public ResponseEntity<Void> orderPaymentByCustomerFromCredit(@PathVariable Long customerId, @PathVariable Long specialistId, @PathVariable Double paymentAmount, @PathVariable Long orderId) {
+        bankAccountService.finalPaymentByCustomerFromCredit(customerId, specialistId, paymentAmount, orderId);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/online/finalPaymentFromOnlineGateway")
     public void finalPaymentFromOnlineGateway(@RequestBody BankAccountRequestDto bankAccountRequestDto) {
         BankAccount bankAccount = BankAccountRequestDto.dtoToBankAccount(bankAccountRequestDto);
-        bankAccountService.finalPaymentByCustomerFromOnlinePaymentGateway(bankAccount, bankAccountRequestDto.getSpecialistId(), bankAccountRequestDto.getPrice());
+        bankAccountService.finalPaymentByCustomerFromOnlinePaymentGateway(bankAccount, bankAccountRequestDto.getSpecialistId(), bankAccountRequestDto.getPrice(), bankAccountRequestDto.getOrderId());
 
     }
 

@@ -2,7 +2,6 @@ package ir.example.finalPart03.service;
 
 
 import ir.example.finalPart03.model.Order;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,8 +26,7 @@ public interface OrderService {
 
     Order changeOrderStatusToDone(Long orderId, Long customerId);
 
-    @Transactional
-    Order changeOrderStatusToPaid(Long orderId, Long customerId);
+    Order changeOrderStatusToPaid(Long orderId);
 
     void checkOrdersAndUpdateScores(Long suggestionId, Long specialistId);
 }

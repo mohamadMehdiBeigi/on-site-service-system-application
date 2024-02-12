@@ -31,8 +31,6 @@ public class SuggestionsServiceImpl implements SuggestionService {
     @Override
     public Suggestions saveSuggestion(Suggestions suggestions, Long orderId, Long specialistId) {
 
-
-
             if (suggestions.getOrder() == null){
                 Order order = new Order();
                 order.setId(orderId);
@@ -44,7 +42,6 @@ public class SuggestionsServiceImpl implements SuggestionService {
                 specialist.setId(specialistId);
                 suggestions.setSpecialist(specialist);
             }
-        List<Order> allByOrderStatusAndSpecialistId = orderRepository.findAllByOrderStatusAndSpecialistId(specialistId);
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("this order id is not exist"));

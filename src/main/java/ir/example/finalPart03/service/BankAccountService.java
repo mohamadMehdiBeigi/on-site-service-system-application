@@ -10,7 +10,7 @@ public interface BankAccountService {
 
     BankAccount saveBankAccount(BankAccount bankAccount, Long specialistId, Long customerId);
 
-    void finalPaymentByCustomerFromCredit(Long customerId, Long specialistId, Double paymentAmount);
+    void finalPaymentByCustomerFromCredit(Long customerId, Long specialistId, Double paymentAmount, Long orderId);
 
-    void finalPaymentByCustomerFromOnlinePaymentGateway(BankAccount bankAccount, Long specialistId, Double depositAmount);
+    void finalPaymentByCustomerFromOnlinePaymentGateway(BankAccount bankAccount, Long specialistId, Double depositAmount, Long orderId);
 }

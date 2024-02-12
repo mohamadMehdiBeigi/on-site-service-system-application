@@ -19,6 +19,8 @@ public class SpecialistRequestDto {
     @Pattern(regexp = "^\\S+$", message = "password cant have space.")
     private String password;
 
+
+
     public SpecialistRequestDto(String firstname, String lastname, String email, String password) {
         this.firstname = firstname;
         this.lastname = lastname;

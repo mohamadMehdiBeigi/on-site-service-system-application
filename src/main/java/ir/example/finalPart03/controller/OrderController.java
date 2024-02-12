@@ -80,9 +80,9 @@ public class OrderController {
         return ResponseEntity.ok(orderResponseDto);
     }
 
-    @PutMapping("/changeOrderStatusToPaid/{orderId}/{customerId}")
-    public ResponseEntity<OrderResponseDto> changeOrderStatusToPaid(@PathVariable Long orderId,@PathVariable Long customerId){
-        Order order = orderService.changeOrderStatusToPaid(orderId, customerId);
+    @PutMapping("/changeOrderStatusToPaid/{orderId}")
+    public ResponseEntity<OrderResponseDto> changeOrderStatusToPaid(@PathVariable Long orderId){
+        Order order = orderService.changeOrderStatusToPaid(orderId);
         OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
         return ResponseEntity.ok(orderResponseDto);
     }

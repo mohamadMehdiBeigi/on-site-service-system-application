@@ -8,18 +8,19 @@ import ir.example.finalPart03.model.Customer;
 import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.repository.BankAccountRepository;
 import ir.example.finalPart03.service.BankAccountService;
+import ir.example.finalPart03.service.OrderService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@AllArgsConstructor
 public class BankAccountServiceImpl implements BankAccountService {
 
     private BankAccountRepository bankAccountRepository;
 
-    public BankAccountServiceImpl(BankAccountRepository bankAccountRepository) {
-        this.bankAccountRepository = bankAccountRepository;
-    }
+    private OrderService orderService;
 
 
     @Override
@@ -46,21 +47,23 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public void finalPaymentByCustomerFromCredit(Long customerId, Long specialistId, Double paymentAmount) {
+    public void finalPaymentByCustomerFromCredit(Long customerId, Long specialistId, Double paymentAmount, Long orderId) {
         Double payment = orderPaymentByCustomerFromCredit(customerId, paymentAmount);
         depositToSpecialistBalance(specialistId, payment);
-
+        orderService.changeOrderStatusToPaid(orderId);
     }
 
     @Override
-    public void finalPaymentByCustomerFromOnlinePaymentGateway(BankAccount bankAccount, Long specialistId, Double depositAmount) {
-        try {
-            BankAccount byAllColumns = findByAllColumns(bankAccount);
-            if (byAllColumns == null) {
-                throw new NotFoundException("there is no bank account with this inputs");
-            }
+    public void finalPaymentByCustomerFromOnlinePaymentGateway(BankAccount bankAccount, Long specialistId, Double depositAmount, Long orderId) {
 
+        BankAccount byAllColumns = findByAllColumns(bankAccount);
+        if (byAllColumns == null) {
+            throw new NotFoundException("there is no bank account with this inputs");
+        }
+        try {
             depositToSpecialistBalance(specialistId, depositAmount);
+            orderService.changeOrderStatusToPaid(orderId);
+
         } catch (Exception e) {
             throw new BadRequestException("invalid inputs for deposit to specialist account" + e.getMessage());
         }
