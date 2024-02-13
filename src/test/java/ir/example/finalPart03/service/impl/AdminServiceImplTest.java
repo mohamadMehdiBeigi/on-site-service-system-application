@@ -1,6 +1,7 @@
 package ir.example.finalPart03.service.impl;
 
 import ir.example.finalPart03.model.Admin;
+import ir.example.finalPart03.model.enums.Role;
 import ir.example.finalPart03.repository.AdminRepository;
 import ir.example.finalPart03.service.AdminService;
 import ir.example.finalPart03.util.RandomStringGenerator;
@@ -11,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -35,21 +35,15 @@ class AdminServiceImplTest {
                 "admin" + RandomStringGenerator.randomGenerator() + "@gmail.com",
                 "admin",
                 LocalDateTime.now(),
-                0.0
+                Role.ROLE_ADMIN
+
         );
 //        ValidationUtil.validate(admin);
         savedAdmin = adminRepository.save(admin);
     }
 
-    @Test
-    @Order(1)
-    void findByEmailAndPassword() {
-        Admin byEmailAndPassword = adminService.findByEmailAndPassword(savedAdmin.getEmail(), savedAdmin.getPassword());
-        assertNotNull(byEmailAndPassword, "this cant be null");
-    }
 
     @Test
-    @Order(2)
     void checkUniqueEmailThrowsException() {
         Admin admin = adminRepository.findById(savedAdmin.getId()).get();
         assertThrows(EntityExistsException.class, () -> adminService.checkUniqueEmail(admin.getEmail()));

@@ -54,7 +54,7 @@ public class SuggestionsServiceImpl implements SuggestionService {
             return suggestionsRepository.save(suggestions);
 
         } catch (Exception e) {
-            throw new BadRequestException("there is error with extracting order id" + e.getMessage());
+            throw new BadRequestException("there is error with extracting order id \n" + e.getMessage());
         }
     }
 
@@ -63,7 +63,7 @@ public class SuggestionsServiceImpl implements SuggestionService {
         try {
             return suggestionsRepository.findAllByCustomerIdOrderBySuggestedPrice(customerId);
         } catch (Exception e) {
-            throw new NotFoundException("this id has no suggestions from specialist" + e.getMessage());
+            throw new NotFoundException("this id has no suggestions from specialist \n" + e.getMessage());
         }
     }
 
@@ -72,7 +72,7 @@ public class SuggestionsServiceImpl implements SuggestionService {
         try {
             return suggestionsRepository.findAllByCustomerIdOrderByTotalScores(customerId);
         } catch (Exception e) {
-            throw new NotFoundException("this id has no suggestions from specialist" + e.getMessage());
+            throw new NotFoundException("this id has no suggestions from specialist \n" + e.getMessage());
         }
     }
 

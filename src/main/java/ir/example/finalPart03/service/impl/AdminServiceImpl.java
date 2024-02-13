@@ -1,16 +1,14 @@
 package ir.example.finalPart03.service.impl;
 
 import ir.example.finalPart03.config.exceptions.BadRequestException;
-import ir.example.finalPart03.model.Customer;
-import ir.example.finalPart03.model.Services;
-import ir.example.finalPart03.model.Specialist;
-import ir.example.finalPart03.model.SubServices;
+import ir.example.finalPart03.model.*;
 import ir.example.finalPart03.repository.AdminRepository;
 import ir.example.finalPart03.service.AdminService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Order;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -30,7 +29,10 @@ public class AdminServiceImpl implements AdminService {
     private EntityManager entityManager;
 
 
-
+    @Override
+    public Optional<Admin> findByEmail(String email) {
+        return adminRepository.findByEmail(email);
+    }
 
     @Override
     public Boolean checkUniqueEmail(String email) {
@@ -63,13 +65,12 @@ public class AdminServiceImpl implements AdminService {
         }
 
         if (param.containsKey("specialistField") && param.get("specialistField") != null) {
-            // Join برای رسیدن به نام سرویس در entity Services
+
             Join<Specialist, SubServices> subServiceJoin = specialistRoot.join("subServices", JoinType.INNER);
             Join<SubServices, Services> serviceJoin = subServiceJoin.join("services", JoinType.INNER);
             predicates.add(criteriaBuilder.equal(serviceJoin.get("serviceName"), param.get("specialistField")));
         }
 
-// تعیین ترتیب مرتب‌سازی بر اساس averageScores
         if (param.containsKey("averageScoresOrderBy") && param.get("averageScoresOrderBy") != null) {
             if (param.get("averageScoresOrderBy").equalsIgnoreCase("asc")) {
                 orderList.add(criteriaBuilder.asc(specialistRoot.get("averageScores")));
@@ -78,7 +79,6 @@ public class AdminServiceImpl implements AdminService {
             }
         }
 
-// بر اساس تمام شرط‌های جمع‌آوری شده کوئری را می‌سازیم
         if (orderList.isEmpty()) {
             criteriaQuery.select(specialistRoot)
                     .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))

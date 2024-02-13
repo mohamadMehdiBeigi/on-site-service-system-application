@@ -3,6 +3,7 @@ package ir.example.finalPart03.model;
 
 import ir.example.finalPart03.config.PasswordGenerator;
 import ir.example.finalPart03.model.baseModel.BaseEntity;
+import ir.example.finalPart03.model.enums.Role;
 import ir.example.finalPart03.util.validations.ValidLocalDateTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -40,6 +41,10 @@ public class Users extends BaseEntity<Long> {
 
     @ValidLocalDateTime
     LocalDateTime signupDate;
+
+    @Enumerated(EnumType.STRING)
+    Role role;
+
     @PrePersist
     private void preparePasswordAndOthers() {
         if (password == null || password.isEmpty()) {

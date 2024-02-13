@@ -32,18 +32,18 @@ public class SubServicesServiceImpl implements SubServiceService {
 
     @Override
     public SubServices saveSubService(SubServices subService, Long serviceId) {
+        if (!checkUniqueSubServiceName(subService.getSubServiceName(), subService.getId())) {
+            throw new DuplicateException("Email already exists");
+        }
+        if (subService.getServices() == null) {
+            Services services = new Services();
+            services.setId(serviceId);
+            subService.setServices(services);
+        }
         try {
-            if (!checkUniqueSubServiceName(subService.getSubServiceName(), subService.getId())) {
-                throw new DuplicateException("Email already exists");
-            }
-            if (subService.getServices() == null){
-                Services services = new Services();
-                services.setId(serviceId);
-                subService.setServices(services);
-            }
             return subServicesRepository.save(subService);
         } catch (Exception e) {
-            throw new BadRequestException("cant save subService, invalid body input" + e.getMessage());
+            throw new BadRequestException("cant save subService, invalid body input \n" + e.getMessage());
         }
     }
 
@@ -51,12 +51,12 @@ public class SubServicesServiceImpl implements SubServiceService {
     public SubServices updateBasePriceAndDescription(Long id, Double newBasePrice, String description) {
         SubServices subServices = subServicesRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("this subService id is not found!"));
+        subServices.setBasePrice(newBasePrice);
+        subServices.setDescription(description);
         try {
-            subServices.setBasePrice(newBasePrice);
-            subServices.setDescription(description);
             return subServicesRepository.save(subServices);
         } catch (Exception e) {
-            throw new BadRequestException("cant update basePrice and description, invalid inputs" + e.getMessage());
+            throw new BadRequestException("cant update basePrice and description, invalid inputs \n" + e.getMessage());
         }
     }
 
@@ -66,7 +66,7 @@ public class SubServicesServiceImpl implements SubServiceService {
             return subServicesRepository.findAllByServicesId(serviceId);
 
         } catch (Exception e) {
-            throw new NotFoundException("this Service id is not existed" + e.getMessage());
+            throw new NotFoundException("this Service id is not existed \n" + e.getMessage());
         }
     }
 
@@ -91,7 +91,7 @@ public class SubServicesServiceImpl implements SubServiceService {
         try {
             subServicesRepository.deleteById(subServiceId);
         } catch (Exception e) {
-            throw new RuntimeException("cant delete subService,please enter valid id" + e.getMessage());
+            throw new RuntimeException("cant delete subService,please enter valid id \n" + e.getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ public class SubServicesServiceImpl implements SubServiceService {
     public void removeSubServiceByServiceId(Long serviceId) {
         try {
             List<SubServices> allByServicesId = subServicesRepository.findAllByServicesId(serviceId);
-            if (allByServicesId.size() != 0){
+            if (allByServicesId.size() != 0) {
                 subServicesRepository.removeSubServiceRelationalByServiceId(serviceId);
             }
         } catch (Exception e) {
@@ -118,8 +118,12 @@ public class SubServicesServiceImpl implements SubServiceService {
             subService.getSpecialists().remove(specialist);
             subServicesRepository.delete(subService);
         });
+        try {
+            specialistRepository.save(specialist);
 
-        specialistRepository.save(specialist);
+        } catch (Exception e) {
+            throw new BadRequestException("cant delete this subservice \n" + e.getMessage());
+        }
     }
 
 

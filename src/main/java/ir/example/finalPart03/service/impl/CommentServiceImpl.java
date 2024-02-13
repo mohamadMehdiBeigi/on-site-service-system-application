@@ -23,14 +23,15 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comments saveComment(Comments comments, Long orderId) {
-        try {
+
             if (comments.getOrder().getOrderStatus() == null) {
                 Order order = new Order();
                 order.setId(orderId);
                 comments.setOrder(order);
             }
-
+        try {
             return commentRepository.save(comments);
+
         } catch (Exception e) {
             throw new BadRequestException("invalid comment input, cant save comment.\n" + e.getMessage());
         }

@@ -28,9 +28,9 @@ public class CustomerController {
         return new ResponseEntity<>(customerResponseDto, HttpStatus.CREATED);
     }
 
-    @PutMapping("/customer/changePassword/{customerId}/{password}/{confirmingPassword}")
-    ResponseEntity<Void> changePassword(@PathVariable Long customerId, @PathVariable String password, @PathVariable String confirmingPassword) {
-        customerService.changePassword(customerId, password, confirmingPassword);
+    @PutMapping("/customer/changePassword/{customerId}/{oldPassword}/{password}/{confirmingPassword}")
+    ResponseEntity<Void> changePassword(@PathVariable Long customerId, @PathVariable String oldPassword, @PathVariable String password, @PathVariable String confirmingPassword) {
+        customerService.changePassword(customerId, oldPassword, password, confirmingPassword);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

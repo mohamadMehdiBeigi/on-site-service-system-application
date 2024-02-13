@@ -40,8 +40,6 @@ class SpecialistServiceImplTest {
     private Specialist savedSpecialist;
 
 
-
-
     @BeforeEach
     void init() throws IOException {
 
@@ -61,7 +59,6 @@ class SpecialistServiceImplTest {
         assertEquals(savedSpecialist, specialist);
 
     }
-
 
 
     @Test
@@ -118,7 +115,7 @@ class SpecialistServiceImplTest {
     void changePassword() {
         Specialist specialist = specialistRepository.findById(savedSpecialist.getId()).get();
         String password = specialist.getPassword();
-        specialistService.changePassword(specialist.getId(), "changedPassword1", "changedPassword1");
+        specialistService.changePassword(specialist.getId(), specialist.getPassword(), "changedPassword1", "changedPassword1");
         Specialist changedSpecialist = specialistRepository.findById(specialist.getId()).get();
         String newPassword = changedSpecialist.getPassword();
         assertNotNull(changedSpecialist, "changedSpecialist shouldn;t be null!");

@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface SpecialistRepository extends JpaRepository<Specialist, Long> {
 
-    Optional<Specialist> findByEmailAndPassword(String email, String password);
+    Optional<Specialist> findByEmail(String email);
 
     @Query(nativeQuery = true, value =
             "select count(c.email) " +

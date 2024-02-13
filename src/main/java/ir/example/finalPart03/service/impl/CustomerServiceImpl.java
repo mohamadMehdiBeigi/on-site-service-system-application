@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,14 +22,19 @@ public class CustomerServiceImpl implements CustomerService {
         this.customerRepository = customerRepository;
     }
 
+    @Override
+    public Optional<Customer> findByEmail(String email) {
+        return customerRepository.findByEmail(email);
+    }
+
     @Transactional
     @Override
     public Customer saveCustomer(Customer customer) {
-        try {
-            if (!checkUniqueEmail(customer.getEmail(), customer.getId())) {
-                throw new DuplicateException("Email already exists");
-            }
 
+        if (!checkUniqueEmail(customer.getEmail(), customer.getId())) {
+            throw new DuplicateException("Email already exists");
+        }
+        try {
             return customerRepository.save(customer);
         } catch (Exception e) {
             throw new BadRequestException("Can't save or update customer data: " + e.getMessage());
@@ -37,14 +43,23 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Transactional
     @Override
-    public void changePassword(Long id, String password, String confirmingPassword) {
+    public void changePassword(Long id, String oldPassword, String password, String confirmingPassword) {
         if (!Objects.equals(password, confirmingPassword)) {
             throw new DuplicateException("password and confirming password is not the same");
         }
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("this customerId is not found!"));
+        if (!Objects.equals(oldPassword, customer.getPassword())) {
+            throw new BadRequestException("your oldPassword is incorrect, please enter your valid old password \n");
+        }
+
         customer.setPassword(password);
-        customerRepository.save(customer);
+        try {
+            customerRepository.save(customer);
+
+        } catch (Exception e) {
+            throw new BadRequestException("invalid input for change customers password" + e.getMessage());
+        }
     }
 
     @Override

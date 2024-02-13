@@ -77,8 +77,7 @@ class OrderServiceImplTest {
                 "ali",
                 "alavi",
                 "alavi" + RandomStringGenerator.randomGenerator() + "@gmail.com",
-                null, LocalDateTime.now(),
-                0.0
+                null, LocalDateTime.now()
         );
         customerRepository.save(customer);
 

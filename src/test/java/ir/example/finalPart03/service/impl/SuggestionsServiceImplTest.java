@@ -81,8 +81,7 @@ class SuggestionsServiceImplTest {
                 "ali",
                 "alavi",
                 "alavi" + RandomStringGenerator.randomGenerator() + "@gmail.com",
-                null, LocalDateTime.now(),
-                0.0
+                null, LocalDateTime.now()
         );
         savedCustomer = customerRepository.save(customer);
 

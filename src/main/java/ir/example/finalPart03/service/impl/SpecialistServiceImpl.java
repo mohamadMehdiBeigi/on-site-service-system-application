@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,14 +32,19 @@ public class SpecialistServiceImpl implements SpecialistService {
         this.subServicesRepository = subServicesRepository;
     }
 
+    @Override
+    public Optional<Specialist> findByEmail(String email) {
+        return specialistRepository.findByEmail(email);
+    }
+
     @Transactional
     @Override
     public Specialist saveSpecialist(Specialist specialist) {
+        if (!checkUniqueEmail(specialist.getEmail(), specialist.getId())) {
+            throw new DuplicateException("this Email is already exists");
+        }
+        specialist.setSpecialistStatus(SpecialistStatus.WAIT_FOR_CONFIRMED);
         try {
-            if (!checkUniqueEmail(specialist.getEmail(), specialist.getId())) {
-                throw new DuplicateException("this Email is already exists");
-            }
-            specialist.setSpecialistStatus(SpecialistStatus.WAIT_FOR_CONFIRMED);
             return specialistRepository.save(specialist);
         } catch (Exception e) {
             throw new BadRequestException("Can't save or update customer data: " + e.getMessage());
@@ -84,12 +90,17 @@ public class SpecialistServiceImpl implements SpecialistService {
 
     @Transactional
     @Override
-    public Specialist changePassword(Long id, String password, String confirmingPassword) {
+    public Specialist changePassword(Long id, String oldPassword, String password, String confirmingPassword) {
         if (!Objects.equals(password, confirmingPassword)) {
             throw new RuntimeException("password and confirming password is not the same");
         }
         Specialist specialist = specialistRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("this specialistId is not found!"));
+
+        if (!Objects.equals(oldPassword, specialist.getPassword())) {
+            throw new BadRequestException("your oldPassword is incorrect, please enter your valid old password \n");
+        }
+
         specialist.setPassword(password);
         return specialistRepository.save(specialist);
     }
@@ -128,22 +139,31 @@ public class SpecialistServiceImpl implements SpecialistService {
         }
         subService.getSpecialists().add(specialist);
         specialist.getSubServices().add(subService);
-
-        specialistRepository.save(specialist);
+        try {
+            specialistRepository.save(specialist);
+        } catch (Exception e) {
+            throw new BadRequestException("invalid id input for make connection between specialist & subService" + e.getMessage());
+        }
     }
 
     @Override
     public Specialist seeAverageScore(Long specialistId) {
         Specialist specialist = specialistRepository.findById(specialistId)
                 .orElseThrow(() -> new NotFoundException("cant find specialist,wrong specialistId"));
+        Double averageScore;
         try {
-            Double averageScore = specialistRepository.avgSpecialistScoreBySpecialistId(specialistId);
-            specialist.setAverageScores(averageScore);
+            averageScore = specialistRepository.avgSpecialistScoreBySpecialistId(specialistId);
+        } catch (Exception e) {
+            throw new BadRequestException("invalid specialistId for get average score.\n" + e.getMessage());
+        }
+        specialist.setAverageScores(averageScore);
+        try {
             return specialistRepository.save(specialist);
 
         } catch (Exception e) {
             throw new BadRequestException("cant set average score to specialist,try again" + e.getMessage());
         }
+
     }
 
     @Override

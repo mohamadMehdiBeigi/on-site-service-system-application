@@ -2,7 +2,11 @@ package ir.example.finalPart03.service;
 
 import ir.example.finalPart03.model.Specialist;
 
+import java.util.Optional;
+
 public interface SpecialistService {
+
+    Optional<Specialist> findByEmail(String email);
 
     Specialist saveSpecialist(Specialist specialist);
 
@@ -10,7 +14,7 @@ public interface SpecialistService {
 
     void confirmingSpecialStatus(Long specialistId);
 
-    Specialist changePassword(Long id, String password, String confirmingPassword);
+    Specialist changePassword(Long id, String oldPassword, String password, String confirmingPassword);
 
     void saveImageToFile(Long id);
 

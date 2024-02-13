@@ -39,9 +39,9 @@ public class SpecialistController {
         return ResponseEntity.ok("successfully adding" + specialistId + "image to 'src\\main\\resources\\extractedImage'");
     }
 
-    @PutMapping("/specialist/changePassword/{specialistId}/{password}/{confirmingPassword}")
-    public ResponseEntity<SpecialistResponseDto> changePassword(@PathVariable Long specialistId, @PathVariable String password, @PathVariable String confirmingPassword) {
-        Specialist specialist = specialistService.changePassword(specialistId, password, confirmingPassword);
+    @PutMapping("/specialist/{oldPassword}/changePassword/{specialistId}/{password}/{confirmingPassword}")
+    public ResponseEntity<SpecialistResponseDto> changePassword(@PathVariable Long specialistId, @PathVariable String oldPassword, @PathVariable String password, @PathVariable String confirmingPassword) {
+        Specialist specialist = specialistService.changePassword(specialistId, oldPassword, password, confirmingPassword);
         SpecialistResponseDto specialistResponseDto = modelMapper.map(specialist, SpecialistResponseDto.class);
         return ResponseEntity.ok(specialistResponseDto);
     }

@@ -25,20 +25,21 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public BankAccount saveBankAccount(BankAccount bankAccount, Long specialistId, Long customerId) {
-        try {
-            if (specialistId != null && customerId != null) {
-                throw new DuplicateException("account number cant not be belong to a specialist and customer at the same time");
-            }
-            if (specialistId != null) {
-                Specialist specialist = new Specialist();
-                specialist.setId(specialistId);
-                bankAccount.setSpecialist(specialist);
 
-            } else if (customerId != null) {
-                Customer customer = new Customer();
-                customer.setId(customerId);
-                bankAccount.setCustomer(customer);
-            }
+        if (specialistId != null && customerId != null) {
+            throw new DuplicateException("account number cant not be belong to a specialist and customer at the same time");
+        }
+        if (specialistId != null) {
+            Specialist specialist = new Specialist();
+            specialist.setId(specialistId);
+            bankAccount.setSpecialist(specialist);
+
+        } else if (customerId != null) {
+            Customer customer = new Customer();
+            customer.setId(customerId);
+            bankAccount.setCustomer(customer);
+        }
+        try {
             return bankAccountRepository.save(bankAccount);
 
         } catch (Exception e) {
@@ -60,8 +61,8 @@ public class BankAccountServiceImpl implements BankAccountService {
         if (byAllColumns == null) {
             throw new NotFoundException("there is no bank account with this inputs");
         }
+        depositToSpecialistBalance(specialistId, depositAmount);
         try {
-            depositToSpecialistBalance(specialistId, depositAmount);
             orderService.changeOrderStatusToPaid(orderId);
 
         } catch (Exception e) {
@@ -79,9 +80,9 @@ public class BankAccountServiceImpl implements BankAccountService {
         if (bankAccountBalance < paymentAmount) {
             throw new BadRequestException("you dont have enough money on your credit, please charge your account or select <OnlinePayment>");
         }
+        double remainingCredit = bankAccountBalance - paymentAmount;
+        bankAccount.setBalance(remainingCredit);
         try {
-            double remainingCredit = bankAccountBalance - paymentAmount;
-            bankAccount.setBalance(remainingCredit);
             bankAccountRepository.save(bankAccount);
             return remainingCredit;
 
@@ -96,10 +97,12 @@ public class BankAccountServiceImpl implements BankAccountService {
 
         BankAccount bankAccount = bankAccountRepository.findBySpecialistId(specialistId)
                 .orElseThrow(() -> new NotFoundException("this specialist id is not exist"));
-        try {
+
             Double deductedDepositAmount = depositAmount * 0.7;
             double finalBalance = bankAccount.getBalance() + deductedDepositAmount;
             bankAccount.setBalance(finalBalance);
+
+        try {
             bankAccountRepository.save(bankAccount);
 
         } catch (RuntimeException e) {

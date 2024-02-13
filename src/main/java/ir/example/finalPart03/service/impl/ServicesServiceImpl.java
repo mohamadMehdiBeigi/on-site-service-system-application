@@ -24,11 +24,10 @@ public class ServicesServiceImpl implements ServicesService {
 
     @Override
     public Services saveService(Services services) {
-        try {
             if (!checkUniqueServiceName(services.getServiceName(), services.getId())) {
                 throw new DuplicateException("Email already exists");
             }
-
+        try {
             return servicesRepository.save(services);
         } catch (Exception e) {
             throw new BadRequestException("Can't save or update customer data: " + e.getMessage());
@@ -57,7 +56,7 @@ public class ServicesServiceImpl implements ServicesService {
         try {
             servicesRepository.deleteById(serviceId);
         } catch (Exception e) {
-            throw new BadRequestException("cant delete service data,try again.");
+            throw new BadRequestException("cant delete service data,try again." + e.getMessage());
         }
     }
 }

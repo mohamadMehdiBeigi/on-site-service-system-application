@@ -1,14 +1,18 @@
 package ir.example.finalPart03.model;
 
+import ir.example.finalPart03.model.enums.Role;
 import ir.example.finalPart03.model.enums.SpecialistStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 //@Getter
@@ -19,7 +23,7 @@ import java.util.Set;
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
-public class Specialist extends Users  {
+public class Specialist extends Users implements UserDetails {
 
     @Enumerated(value = EnumType.STRING)
     SpecialistStatus specialistStatus;
@@ -38,8 +42,8 @@ public class Specialist extends Users  {
     )
     Set<SubServices> subServices;
 
-    public Specialist(@Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "firstname must have been included just English alphabet") String firstname, @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "lastname must have been include just English alphabet") String lastname, @Email(message = "email syntax is incorrect") String email, @Pattern(regexp = "^\\S+$", message = "password cant have space.") String password, LocalDateTime signupDate, SpecialistStatus specialistStatus, byte[] image, Double averageScores, Set<SubServices> subServices) {
-        super(firstname, lastname, email, password, signupDate);
+    public Specialist(String firstname, String lastname, String email, String password, LocalDateTime signupDate, SpecialistStatus specialistStatus, byte[] image, Double averageScores, Set<SubServices> subServices, Role role) {
+        super(firstname, lastname, email, password, signupDate, role);
         this.specialistStatus = specialistStatus;
         this.image = image;
         this.averageScores = averageScores;
@@ -79,5 +83,35 @@ public class Specialist extends Users  {
 
     public void setSubServices(Set<SubServices> subServices) {
         this.subServices = subServices;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(getRole().name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

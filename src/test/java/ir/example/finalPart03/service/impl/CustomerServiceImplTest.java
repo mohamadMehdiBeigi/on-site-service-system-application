@@ -33,8 +33,7 @@ class CustomerServiceImplTest {
                 "ali",
                 "alavi",
                 "alavi" + RandomStringGenerator.randomGenerator() + "@gmail.com",
-                null, LocalDateTime.now(),
-                0.0);
+                null, LocalDateTime.now());
         savedCustomer = customerService.saveCustomer(customer);
 
     }
@@ -47,27 +46,20 @@ class CustomerServiceImplTest {
         assertEquals(savedCustomer, customer);
     }
 
+
     @Test
     @Order(2)
-    void findByEmailAndPassword() {
-        Customer byEmailAndPassword = customerService.findByEmailAndPassword(savedCustomer.getEmail(), savedCustomer.getPassword());
-        assertNotNull(byEmailAndPassword, "this shouldn't be null");
-
-    }
-
-    @Test
-    @Order(3)
     void changePassword() {
         Customer customer = customerRepository.findById(savedCustomer.getId()).get();
         customer.setPassword(RandomStringGenerator.randomGenerator());
-        customerService.changePassword(customer.getId(), "changedPassword", "changedPassword");
+        customerService.changePassword(customer.getId(),customer.getPassword(), "changedPassword", "changedPassword");
         Customer changedCustomer = customerRepository.findById(savedCustomer.getId()).get();
         assertNotNull(changedCustomer, "changedSpecialist shouldn;t be null!");
         assertNotEquals(changedCustomer.getPassword(), customer.getPassword());
     }
 
     @Test
-    @Order(4)
+    @Order(3)
     void checkUniqueEmail() {
         Customer customer = customerRepository.findById(savedCustomer.getId()).get();
         assertThrows(RuntimeException.class,

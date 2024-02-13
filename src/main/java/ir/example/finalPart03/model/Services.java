@@ -25,6 +25,10 @@ public class Services extends BaseEntity<Long> implements Serializable {
     @Column(unique = true)
     String serviceName;
 
+
+
+
+
     public Services() {
     }
 

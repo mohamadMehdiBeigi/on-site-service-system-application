@@ -1,15 +1,18 @@
 package ir.example.finalPart03.model;
 
+import ir.example.finalPart03.model.enums.Role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,11 +22,40 @@ import java.time.LocalDateTime;
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
-public class Admin extends Users{
+public class Admin extends Users implements UserDetails {
 
 
-    public Admin(@Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "firstname must have been included just English alphabet") String firstname, @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "lastname must have been include just English alphabet") String lastname, @Email(message = "email syntax is incorrect") String email, @Pattern(regexp = "^\\S+$", message = "password cant have space.") String password, LocalDateTime signupDate, @Min(value = 0, message = "credit cant be lower than zero") Double credit) {
-        super(firstname, lastname, email, password, signupDate);
+    public Admin(String firstname, String lastname, String email, String password, LocalDateTime signupDate, Role role) {
+        super(firstname, lastname, email, password, signupDate, role);
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(getRole().name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
 }
