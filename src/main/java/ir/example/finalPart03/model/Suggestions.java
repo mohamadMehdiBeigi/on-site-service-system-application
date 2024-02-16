@@ -4,10 +4,11 @@ package ir.example.finalPart03.model;
 import ir.example.finalPart03.model.baseModel.BaseEntity;
 import ir.example.finalPart03.util.validations.ValidLocalDateTime;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
-import lombok.*;
+import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @SuperBuilder
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 public class Suggestions extends BaseEntity<Long> {
@@ -34,10 +34,10 @@ public class Suggestions extends BaseEntity<Long> {
     @Min(value = 0, message = "cant be lower than zero")
     Double durationOfDailyWork;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     Specialist specialist;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     Order order;
 
 

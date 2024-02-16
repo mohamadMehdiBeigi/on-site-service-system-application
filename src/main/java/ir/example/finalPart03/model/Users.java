@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @SuperBuilder
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

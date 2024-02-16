@@ -3,7 +3,10 @@ package ir.example.finalPart03.model;
 import ir.example.finalPart03.model.enums.Role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +22,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @SuperBuilder
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 public class Admin extends Users implements UserDetails {

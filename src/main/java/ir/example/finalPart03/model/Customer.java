@@ -32,15 +32,6 @@ public class Customer extends Users implements UserDetails {
     }
 
     @Override
-    public String toString() {
-        return "Customer{" +
-                "id=" + id +
-                "ss" + getFirstname() +
-                "aa" + getLastname() +
-                '}';
-    }
-
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(getRole().name()));
     }

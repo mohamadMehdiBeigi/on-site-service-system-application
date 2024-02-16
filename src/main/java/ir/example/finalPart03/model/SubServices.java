@@ -4,10 +4,9 @@ package ir.example.finalPart03.model;
 import ir.example.finalPart03.model.baseModel.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import lombok.*;
+import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-
 
 import java.io.Serializable;
 import java.util.Set;
@@ -18,7 +17,6 @@ import java.util.Set;
 //@NoArgsConstructor
 @Entity
 @SuperBuilder
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 public class SubServices extends BaseEntity<Long> implements Serializable {

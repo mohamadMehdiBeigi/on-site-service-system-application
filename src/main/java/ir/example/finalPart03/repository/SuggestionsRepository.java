@@ -14,7 +14,10 @@ public interface SuggestionsRepository extends JpaRepository<Suggestions, Long> 
     List<Suggestions> findAllByCustomerIdOrderBySuggestedPrice(Long customerId);
 
 
-    @Query(nativeQuery = true, value = "select s.* from final_part3.suggestions s join final_part3.\"order\" o on o.id = s.order_id join final_part3.users u on u.id = s.specialist_id where customer_id =:customerId ORDER BY u.average_scores")
+//    @Query(nativeQuery = true, value = "select s.* from final_part3.suggestions s join final_part3.\"order\" o on o.id = s.order_id join final_part3.users u on u.id = s.specialist_id where customer_id =:customerId ORDER BY u.average_scores")
+    @Query(" from Suggestions s " +
+            "where s.order.customer.id =:customerId " +
+            "order by s.specialist.averageScores ")
     List<Suggestions> findAllByCustomerIdOrderByTotalScores(Long customerId);
 
 }

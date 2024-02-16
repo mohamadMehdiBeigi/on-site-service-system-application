@@ -3,7 +3,7 @@ package ir.example.finalPart03.model;
 import ir.example.finalPart03.model.baseModel.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import lombok.*;
+import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Pattern;
@@ -15,7 +15,6 @@ import java.time.LocalDate;
 //@AllArgsConstructor
 //@NoArgsConstructor
 @Entity
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 public class BankAccount extends BaseEntity<Long> implements Serializable {

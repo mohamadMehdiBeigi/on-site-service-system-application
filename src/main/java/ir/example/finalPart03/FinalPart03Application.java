@@ -1,5 +1,6 @@
 package ir.example.finalPart03;
 
+import ir.example.finalPart03.service.SuggestionService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -19,7 +20,7 @@ public class FinalPart03Application {
 //        ServicesService servicesService = run.getBean(ServicesService.class);
 //        SpecialistService specialistService = run.getBean(SpecialistService.class);
 //        SubServiceService subServiceService = run.getBean(SubServiceService.class);
-//        SuggestionService suggestionService = run.getBean(SuggestionService.class);
+        SuggestionService suggestionService = run.getBean(SuggestionService.class);
 //        Customer customer = new Customer("aaa", "sss", "sss@gma.com", null, LocalDateTime.now(), 1.0);
 //        Customer customer1 = new Customer();
 //        customer1.setId(1L);
@@ -71,7 +72,7 @@ public class FinalPart03Application {
 //        specialistService.addSubServiceToSpecialist(16L, 11L);
 //        System.out.println(orderService.findAvailableOrdersForSpecialist(77L));
 //        orderService.findAllByOrderStatusAndSpecialistId(77L);
-//        suggestionService.findAllByCustomerIdOrOrderByTotalScores(77L);
+        suggestionService.findAllByCustomerIdOrOrderByTotalScores(3L);
 //        Specialist byId = specialistService.findById(2L);
 //        System.out.println(byId.getAverageScores());
 

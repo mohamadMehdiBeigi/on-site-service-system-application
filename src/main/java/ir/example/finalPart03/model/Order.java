@@ -4,10 +4,10 @@ package ir.example.finalPart03.model;
 import ir.example.finalPart03.model.baseModel.BaseEntity;
 import ir.example.finalPart03.model.enums.OrderStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @SuperBuilder
-@ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
 public class Order extends BaseEntity<Long> implements Serializable {
