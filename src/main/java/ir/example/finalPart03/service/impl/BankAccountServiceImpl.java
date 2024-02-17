@@ -9,18 +9,18 @@ import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.repository.BankAccountRepository;
 import ir.example.finalPart03.service.BankAccountService;
 import ir.example.finalPart03.service.OrderService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BankAccountServiceImpl implements BankAccountService {
 
-    private BankAccountRepository bankAccountRepository;
+    private final BankAccountRepository bankAccountRepository;
 
-    private OrderService orderService;
+    private final OrderService orderService;
 
 
     @Override

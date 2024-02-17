@@ -6,21 +6,18 @@ import ir.example.finalPart03.model.Services;
 import ir.example.finalPart03.repository.ServicesRepository;
 import ir.example.finalPart03.service.ServicesService;
 import ir.example.finalPart03.service.SubServiceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @Service
+@RequiredArgsConstructor
 public class ServicesServiceImpl implements ServicesService {
 
-    private ServicesRepository servicesRepository;
+    private final ServicesRepository servicesRepository;
 
-    private SubServiceService subServiceService;
-
-    public ServicesServiceImpl(ServicesRepository servicesRepository, SubServiceService subServiceService) {
-        this.servicesRepository = servicesRepository;
-        this.subServiceService = subServiceService;
-    }
+    private final SubServiceService subServiceService;
 
     @Override
     public Services saveService(Services services) {

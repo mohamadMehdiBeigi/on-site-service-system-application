@@ -11,7 +11,7 @@ import ir.example.finalPart03.repository.SuggestionsRepository;
 import ir.example.finalPart03.service.OrderService;
 import ir.example.finalPart03.service.SpecialistService;
 import jakarta.persistence.NoResultException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,16 +22,16 @@ import java.util.Objects;
 
 @Transactional
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-    private SpecialistRepository specialistRepository;
+    private final SpecialistRepository specialistRepository;
 
-    private SpecialistService specialistService;
+    private final SpecialistService specialistService;
 
-    private SuggestionsRepository suggestionsRepository;
+    private final SuggestionsRepository suggestionsRepository;
 
 
     @Override

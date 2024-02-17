@@ -1,23 +1,22 @@
 package ir.example.finalPart03.model;
 
-import ir.example.finalPart03.model.enums.Role;
 import ir.example.finalPart03.model.enums.SpecialistStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.Set;
 
 //@Getter
 //@Setter
-//@AllArgsConstructor
+@AllArgsConstructor
 //@NoArgsConstructor
 @Entity
 @SuperBuilder
@@ -42,13 +41,6 @@ public class Specialist extends Users implements UserDetails {
     )
     Set<SubServices> subServices;
 
-    public Specialist(String firstname, String lastname, String email, String password, LocalDateTime signupDate, SpecialistStatus specialistStatus, byte[] image, Double averageScores, Set<SubServices> subServices, Role role) {
-        super(firstname, lastname, email, password, signupDate, role);
-        this.specialistStatus = specialistStatus;
-        this.image = image;
-        this.averageScores = averageScores;
-        this.subServices = subServices;
-    }
 
     public Specialist() {
     }
@@ -87,31 +79,36 @@ public class Specialist extends Users implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(getRole().name()));
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(getRole().name());
+        return Collections.singletonList(authority);    }
+
+    @Override
+    public String getPassword() {
+        return super.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return super.getEmail();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return !super.getLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return super.getEnabled();
     }
 }

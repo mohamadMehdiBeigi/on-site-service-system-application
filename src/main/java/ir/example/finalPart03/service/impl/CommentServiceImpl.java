@@ -6,6 +6,7 @@ import ir.example.finalPart03.model.Comments;
 import ir.example.finalPart03.model.Order;
 import ir.example.finalPart03.repository.CommentRepository;
 import ir.example.finalPart03.service.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,13 +14,11 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
-    public CommentServiceImpl(CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
-    }
 
     @Override
     public Comments saveComment(Comments comments, Long orderId) {

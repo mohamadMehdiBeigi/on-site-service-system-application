@@ -1,4 +1,4 @@
-package ir.example.finalPart03.config;
+package ir.example.finalPart03.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

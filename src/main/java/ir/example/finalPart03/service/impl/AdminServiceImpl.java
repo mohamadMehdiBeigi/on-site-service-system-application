@@ -7,9 +7,9 @@ import ir.example.finalPart03.service.AdminService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
 import jakarta.persistence.criteria.Order;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.criteria.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +20,10 @@ import java.util.Optional;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
 
     @PersistenceContext
     private EntityManager entityManager;

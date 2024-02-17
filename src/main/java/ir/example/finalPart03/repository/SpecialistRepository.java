@@ -2,8 +2,10 @@ package ir.example.finalPart03.repository;
 
 import ir.example.finalPart03.model.Specialist;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -11,6 +13,11 @@ import java.util.Optional;
 public interface SpecialistRepository extends JpaRepository<Specialist, Long> {
 
     Optional<Specialist> findByEmail(String email);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Specialist a SET a.enabled=true WHERE a.email=:email")
+    int enableAppUser(String email);
 
     @Query(nativeQuery = true, value =
             "select count(c.email) " +

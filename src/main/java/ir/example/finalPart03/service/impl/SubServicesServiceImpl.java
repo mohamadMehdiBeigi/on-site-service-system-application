@@ -10,6 +10,7 @@ import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SubServicesRepository;
 import ir.example.finalPart03.service.SubServiceService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,17 +19,13 @@ import java.util.Set;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class SubServicesServiceImpl implements SubServiceService {
 
-    private SubServicesRepository subServicesRepository;
+    private final SubServicesRepository subServicesRepository;
 
-    private SpecialistRepository specialistRepository;
+    private final SpecialistRepository specialistRepository;
 
-
-    public SubServicesServiceImpl(SubServicesRepository subServicesRepository, SpecialistRepository specialistRepository) {
-        this.subServicesRepository = subServicesRepository;
-        this.specialistRepository = specialistRepository;
-    }
 
     @Override
     public SubServices saveSubService(SubServices subService, Long serviceId) {

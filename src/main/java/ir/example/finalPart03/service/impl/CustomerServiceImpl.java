@@ -6,6 +6,7 @@ import ir.example.finalPart03.config.exceptions.NotFoundException;
 import ir.example.finalPart03.model.Customer;
 import ir.example.finalPart03.repository.CustomerRepository;
 import ir.example.finalPart03.service.CustomerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +14,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
 
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
 
     @Override
     public Optional<Customer> findByEmail(String email) {

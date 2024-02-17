@@ -1,6 +1,5 @@
 package ir.example.finalPart03.model;
 
-import ir.example.finalPart03.model.enums.Role;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -13,9 +12,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -27,38 +25,44 @@ import java.util.List;
 public class Customer extends Users implements UserDetails {
 
 
-    public Customer(String firstname, String lastname, String email, String password, LocalDateTime signupDate, Role role) {
-        super(firstname, lastname, email, password, signupDate, role);
-    }
+//    public Customer(String firstname, String lastname, String email, String password, LocalDateTime signupDate, Role role) {
+//        super(firstname, lastname, email, password, signupDate, role);
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(getRole().name()));
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(getRole().name());
+        return Collections.singletonList(authority);
     }
 
 
     @Override
+    public String getPassword() {
+        return super.getPassword();
+    }
+
+    @Override
     public String getUsername() {
-        return null;
+        return super.getEmail();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return !super.getLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return super.getEnabled();
     }
 }

@@ -9,6 +9,7 @@ import ir.example.finalPart03.model.enums.SpecialistStatus;
 import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SubServicesRepository;
 import ir.example.finalPart03.service.SpecialistService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,17 +21,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class SpecialistServiceImpl implements SpecialistService {
 
-    private SpecialistRepository specialistRepository;
+    private final SpecialistRepository specialistRepository;
 
-    private SubServicesRepository subServicesRepository;
+    private final SubServicesRepository subServicesRepository;
 
-    public SpecialistServiceImpl(SpecialistRepository specialistRepository, SubServicesRepository subServicesRepository) {
-        this.specialistRepository = specialistRepository;
-        this.subServicesRepository = subServicesRepository;
-    }
 
     @Override
     public Optional<Specialist> findByEmail(String email) {

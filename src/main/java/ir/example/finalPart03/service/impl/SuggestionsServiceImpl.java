@@ -9,22 +9,21 @@ import ir.example.finalPart03.repository.OrderRepository;
 import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SuggestionsRepository;
 import ir.example.finalPart03.service.SuggestionService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Transactional(readOnly = true)
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SuggestionsServiceImpl implements SuggestionService {
 
-    private SuggestionsRepository suggestionsRepository;
+    private final SuggestionsRepository suggestionsRepository;
 
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-    private SpecialistRepository specialistRepository;
+    private final SpecialistRepository specialistRepository;
 
 
     @Transactional
