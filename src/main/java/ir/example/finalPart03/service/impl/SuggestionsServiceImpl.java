@@ -5,6 +5,8 @@ import ir.example.finalPart03.config.exceptions.NotFoundException;
 import ir.example.finalPart03.model.Order;
 import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.model.Suggestions;
+import ir.example.finalPart03.model.baseModel.BaseEntity;
+import ir.example.finalPart03.model.enums.OrderStatus;
 import ir.example.finalPart03.repository.OrderRepository;
 import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SuggestionsRepository;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,25 +33,45 @@ public class SuggestionsServiceImpl implements SuggestionService {
     @Override
     public Suggestions saveSuggestion(Suggestions suggestions, Long orderId, Long specialistId) {
 
-            if (suggestions.getOrder() == null){
-                Order order = new Order();
-                order.setId(orderId);
-                suggestions.setOrder(order);
-            }
+        if (suggestions.getOrder() == null) {
+            Order order = new Order();
+            order.setId(orderId);
+            suggestions.setOrder(order);
+        }
 
-            if (suggestions.getSpecialist() == null){
-                Specialist specialist = new Specialist();
-                specialist.setId(specialistId);
-                suggestions.setSpecialist(specialist);
-            }
+        if (suggestions.getSpecialist() == null) {
+            Specialist specialist = new Specialist();
+            specialist.setId(specialistId);
+            suggestions.setSpecialist(specialist);
+        }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("this order id is not exist"));
 
+        List<Order> allByOrderStatusAndSpecialistId = orderRepository.findAllByOrderStatusAndSpecialistId(specialistId);
+
+        List<Long> collect = allByOrderStatusAndSpecialistId.stream().map(BaseEntity::getId).toList();
+        if (!collect.contains(order.getId())) {
+            throw new BadRequestException("you must only select Orders that are related to you");
+        }
+
+        if (order.getOrderStatus() != OrderStatus.WAITING_FOR_THE_SUGGESTION_OF_SPECIALIST &&
+                order.getOrderStatus() != (OrderStatus.WAITING_FOR_SPECIALIST_SELECTION)) {
+            throw new BadRequestException("order status must be WAITING_FOR_THE_SUGGESTION_OF_SPECIALIST or WAITING_FOR_SPECIALIST_SELECTION");
+        }
 
         if (suggestions.getSuggestedPrice() < order.getSuggestedPrice()) {
-                throw new BadRequestException("orderPrice cant be less than your suggested price,try equal or more price");
-            }
+            throw new BadRequestException("orderPrice cant be less than your suggested price,try equal or more price");
+        }
+        if (suggestions.getSuggestedTimeToStartWork().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("suggested Time to start work is before current time ." +
+                    "please type a valid time");
+        }
+        if (suggestions.getSuggestedTimeToStartWork().isBefore(order.getStartDayOfWork())) {
+            throw new BadRequestException("suggested Time to start work is before start day of work in order :" + order.getStartDayOfWork()  +
+                    " please type a valid time");
+        }
+
         try {
             return suggestionsRepository.save(suggestions);
 

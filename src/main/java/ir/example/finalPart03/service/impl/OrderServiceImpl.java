@@ -2,6 +2,7 @@ package ir.example.finalPart03.service.impl;
 
 import ir.example.finalPart03.config.exceptions.BadRequestException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
+import ir.example.finalPart03.model.Order;
 import ir.example.finalPart03.model.*;
 import ir.example.finalPart03.model.enums.OrderStatus;
 import ir.example.finalPart03.model.enums.SpecialistStatus;
@@ -10,13 +11,17 @@ import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SuggestionsRepository;
 import ir.example.finalPart03.service.OrderService;
 import ir.example.finalPart03.service.SpecialistService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -146,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("your previous order status is not <STARTED>");
         }
         order.setOrderStatus(OrderStatus.DONE);
-
+        order.setEndTimeOfWork(LocalDateTime.now());
         try {
             return orderRepository.save(order);
 
@@ -204,45 +209,75 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    //    public void changeStatusOfOrderByCustomerToFinish(Integer suggestionId, String timeOfFinishingWork) {
-//        Suggestions suggestion = suggestionRepository.findById(suggestionId)
-//                .orElseThrow(() -> new NotFoundException("i can not found this suggestion"));
-//
-//        String timeOfStartingWork = suggestion.getTimeOfStartingWork();
-//        String durationTimeOfWork = suggestion.getDurationTimeOfWork();
-//
-//        LocalDateTime startWorkTime = LocalDateTime.parse(timeOfStartingWork, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
-//        LocalTime durationTime = LocalTime.parse(durationTimeOfWork, DateTimeFormatter.ofPattern("HH:mm:ss"));
-//
-//        LocalDateTime expectedFinishTime = startWorkTime
-//                .plusHours(durationTime.getHour())
-//                .plusMinutes(durationTime.getMinute())
-//                .plusSeconds(durationTime.getSecond());
-//
-//        LocalDateTime actualFinishTime = LocalDateTime.parse(timeOfFinishingWork, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-//
-//        if (actualFinishTime.isAfter(expectedFinishTime)) {
-//            long delayHours = ChronoUnit.HOURS.between(expectedFinishTime, actualFinishTime);
-//            int ratingReduction = (int) delayHours;
-//
-//            Specialist specialist = suggestion.getSpecialist();
-//            Double currentRating = specialist.getAverageScores();
-//            Double updatedRating = Math.max(0, currentRating - ratingReduction);
-//
-//            if (updatedRating <= 0) {
-//                specialist.setSpecialistStatus(SpecialistStatus.NEW);
-//                specialistRepository.save(specialist);
-//                throw new BadRequestException("your account is disabled");
-//            } else {
-//                expert.setStars(updatedRating);
-//                expertRepository.save(expert);
-//            }
-//        }
-//
-//        CustomerOrder customerOrder = suggestion.getCustomerOrder();
-//        customerOrder.setStatusOfOrder(StatusOfOrder.DONE);
-//        customerOrderRepository.save(customerOrder);
-//    }
+    public List<Order> getUserOrderHistory(Long userId, Class<?> userType) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> query = cb.createQuery(Order.class);
+        Root<Order> orderRoot = query.from(Order.class);
+
+        Join<Order, Customer> customerJoin;
+        Join<Order, Specialist> specialistJoin;
+
+        if (userType.equals(Customer.class)) {
+            customerJoin = orderRoot.join("customer");
+            query.where(cb.equal(customerJoin.get("id"), userId));
+        } else if (userType.equals(Specialist.class)) {
+            specialistJoin = orderRoot.join("subServices").join("specialists");
+            query.where(cb.equal(specialistJoin.get("id"), userId));
+        }
+
+        return entityManager.createQuery(query.select(orderRoot)).getResultList();
+    }
+
+    public List<Order> getOrdersByParameters(LocalDateTime startDate, LocalDateTime endDate, OrderStatus status, String serviceName, String subServiceName) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Order> query = cb.createQuery(Order.class);
+        Root<Order> orderRoot = query.from(Order.class);
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (startDate != null && endDate != null) {
+            predicates.add(cb.between(orderRoot.get("startDayOfWork"), startDate, endDate));
+        }
+        if (status != null) {
+            predicates.add(cb.equal(orderRoot.get("orderStatus"), status));
+        }
+        if (serviceName != null && !serviceName.isEmpty()) {
+            predicates.add(cb.equal(orderRoot.get("subServices").get("services").get("serviceName"), serviceName));
+        }
+        if (subServiceName != null && !subServiceName.isEmpty()) {
+            predicates.add(cb.equal(orderRoot.get("subServices").get("subServiceName"), subServiceName));
+        }
+
+        query.where(predicates.toArray(new Predicate[0]));
+        return entityManager.createQuery(query).getResultList();
+    }
+
+    public Long getUserOrdersCount(Long userId, Class<?> userType) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // Criteria to count the number of orders
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Order> orderRoot = countQuery.from(Order.class);
+        countQuery.select(cb.count(orderRoot));
+
+        if (Customer.class.isAssignableFrom(userType)) {
+            // Count orders for Customer
+            countQuery.where(cb.equal(orderRoot.get("customer").get("id"), userId));
+        } else if (Specialist.class.isAssignableFrom(userType)) {
+            // Count orders for Specialist with status PAID
+            Join<Order, SubServices> subServicesJoin = orderRoot.join("subServices");
+            Join<SubServices, Specialist> specialistJoin = subServicesJoin.join("specialists");
+            countQuery.where(cb.and(
+                    cb.equal(specialistJoin.get("id"), userId),
+                    cb.equal(orderRoot.get("orderStatus"), OrderStatus.PAID)
+            ));
+        } else {
+            throw new IllegalArgumentException("Invalid user type provided");
+        }
+
+        return entityManager.createQuery(countQuery).getSingleResult();
+    }
 
 }

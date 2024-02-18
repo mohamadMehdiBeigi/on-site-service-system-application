@@ -12,14 +12,10 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
+@Entity
 public class Admin extends Users {
-
-
-
-
 
 }

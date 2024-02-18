@@ -79,6 +79,20 @@ public class AdminServiceImpl implements AdminService {
             }
         }
 
+        if (param.containsKey("maxAverageScores")) {
+            Subquery<Double> maxAverageScoreSubquery = criteriaQuery.subquery(Double.class);
+            Root<Specialist> maxRoot = maxAverageScoreSubquery.from(Specialist.class);
+            maxAverageScoreSubquery.select(criteriaBuilder.max(maxRoot.get("averageScores")));
+            predicates.add(criteriaBuilder.equal(specialistRoot.get("averageScores"), maxAverageScoreSubquery));
+        }
+
+        if (param.containsKey("minAverageScores")) {
+            Subquery<Double> minAverageScoreSubquery = criteriaQuery.subquery(Double.class);
+            Root<Specialist> minRoot = minAverageScoreSubquery.from(Specialist.class);
+            minAverageScoreSubquery.select(criteriaBuilder.min(minRoot.get("averageScores")));
+            predicates.add(criteriaBuilder.equal(specialistRoot.get("averageScores"), minAverageScoreSubquery));
+
+        }
         if (orderList.isEmpty()) {
             criteriaQuery.select(specialistRoot)
                     .where(criteriaBuilder.and(predicates.toArray(new Predicate[0])))
@@ -92,9 +106,6 @@ public class AdminServiceImpl implements AdminService {
 
         return query.getResultList();
     }
-
-
-
 
 
     @Override
@@ -125,5 +136,55 @@ public class AdminServiceImpl implements AdminService {
         return query.getResultList();
 
     }
+
+    public <T> List<T> findAllUsersByCriteria(Class<T> userType, Map<String, String> param) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(userType);
+        Root<T> userRoot = criteriaQuery.from(userType);
+
+        List<Predicate> predicates = new ArrayList<>();
+        ArrayList<Order> orderList = new ArrayList<>();
+
+        if (param.containsKey("firstname") && param.get("firstname") != null) {
+            predicates.add(criteriaBuilder.like(userRoot.get("firstname"), "%" + param.get("firstname") + "%"));
+        }
+
+        if (param.containsKey("lastname") && param.get("lastname") != null) {
+            predicates.add(criteriaBuilder.like(userRoot.get("lastname"), "%" + param.get("lastname") + "%"));
+        }
+
+        if (param.containsKey("email") && param.get("email") != null) {
+            predicates.add(criteriaBuilder.equal(userRoot.get("email"), param.get("email")));
+        }
+
+        // چک کردن این که آیا کاربر یک Specialist است
+        if (Specialist.class.isAssignableFrom(userType)) {
+            if (param.containsKey("specialistField") && param.get("specialistField") != null) {
+                Join<T, SubServices> subServiceJoin = userRoot.join("subServices", JoinType.INNER);
+                Join<SubServices, Services> serviceJoin = subServiceJoin.join("services", JoinType.INNER);
+                predicates.add(criteriaBuilder.equal(serviceJoin.get("serviceName"), param.get("specialistField")));
+            }
+        }
+
+        // اگر کاربر "Specialist" باشد و فیلد "averageScoresOrderBy" داشته باشد
+        if (Specialist.class.isAssignableFrom(userType) && param.containsKey("averageScoresOrderBy")) {
+            if (param.get("averageScoresOrderBy").equalsIgnoreCase("asc")) {
+                orderList.add(criteriaBuilder.asc(userRoot.get("averageScores")));
+            } else if (param.get("averageScoresOrderBy").equalsIgnoreCase("desc")) {
+                orderList.add(criteriaBuilder.desc(userRoot.get("averageScores")));
+            }
+        }
+
+        if (!orderList.isEmpty()) {
+            criteriaQuery.orderBy(orderList.toArray(new Order[0]));
+        }
+
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+        TypedQuery<T> query = entityManager.createQuery(criteriaQuery);
+
+        return query.getResultList();
+    }
+
+
 
 }

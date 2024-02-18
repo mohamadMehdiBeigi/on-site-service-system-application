@@ -10,6 +10,11 @@ public class FinalPart03Application {
         ConfigurableApplicationContext run = SpringApplication.run(FinalPart03Application.class, args);
 
 //        AdminService adminService = run.getBean(AdminService.class);
+//        UsersRepository usersRepository = run.getBean(UsersRepository.class);
+//        List<Users> all = usersRepository.findAll();
+//        all.forEach(System.out::println);
+//        System.out.println(all.get(4).getEmail());
+
 
 //        System.out.println(adminService.findAllSpecialistsByCriteria("peciali", null, null, null, null));
 //        System.out.println(adminService.findAllCustomerByCriteria("ust", null, null));
@@ -74,6 +79,7 @@ public class FinalPart03Application {
 //        suggestionService.findAllByCustomerIdOrOrderByTotalScores(3L);
 //        Specialist byId = specialistService.findById(2L);
 //        System.out.println(byId.getAverageScores());
+
 
     }
 }
