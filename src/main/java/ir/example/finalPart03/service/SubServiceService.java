@@ -16,7 +16,10 @@ public interface SubServiceService {
 
     Boolean checkUniqueSubServiceName(String subServiceName, Long subServiceIdForUpdate );
 
-    void deleteSubServiceById(Long subServiceId);
+
+    List<SubServices> findAllSubService();
+
+    void deleteSubService(Long subServiceId);
 
     void removeSubServiceByServiceId(Long serviceId);
 

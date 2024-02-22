@@ -40,8 +40,13 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(a -> a.anyRequest().permitAll())
-                .httpBasic(Customizer.withDefaults());
+                .authorizeHttpRequests(a -> a
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/registration/**").permitAll()
+                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
+                        .requestMatchers("/specialist/**").hasRole("SPECIALIST")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()).httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 
+import java.io.File;
+
 public class SpecialistRequestDto {
 
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "firstname must have been included just English alphabet")
@@ -16,16 +18,14 @@ public class SpecialistRequestDto {
     @Email(message = "email syntax is incorrect")
     private String email;
 
-    @Pattern(regexp = "^\\S+$", message = "password cant have space.")
-    private String password;
+    private File file;
 
 
-
-    public SpecialistRequestDto(String firstname, String lastname, String email, String password) {
+    public SpecialistRequestDto(String firstname, String lastname, String email, File file) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.password = password;
+        this.file = file;
     }
 
     public SpecialistRequestDto() {
@@ -55,12 +55,11 @@ public class SpecialistRequestDto {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public File getFile() {
+        return file;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setFile(File file) {
+        this.file = file;
     }
-
 }

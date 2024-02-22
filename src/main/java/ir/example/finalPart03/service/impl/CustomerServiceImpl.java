@@ -3,10 +3,14 @@ package ir.example.finalPart03.service.impl;
 import ir.example.finalPart03.config.exceptions.BadRequestException;
 import ir.example.finalPart03.config.exceptions.DuplicateException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
+import ir.example.finalPart03.dto.registerations.RegistrationRequest;
 import ir.example.finalPart03.model.Customer;
+import ir.example.finalPart03.model.enums.Role;
 import ir.example.finalPart03.repository.CustomerRepository;
 import ir.example.finalPart03.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,13 @@ import java.util.Optional;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    private final RegistrationService registrationService;
+
+    private final ModelMapper modelMapper;
+
 
 
     @Override
@@ -32,12 +43,27 @@ public class CustomerServiceImpl implements CustomerService {
         if (!checkUniqueEmail(customer.getEmail(), customer.getId())) {
             throw new DuplicateException("Email already exists");
         }
+
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+
+        Customer savedCustomer;
         try {
-            return customerRepository.save(customer);
+            savedCustomer = customerRepository.save(customer);
         } catch (Exception e) {
             throw new BadRequestException("Can't save or update customer data: " + e.getMessage());
         }
+        try {
+            RegistrationRequest registrationRequest = modelMapper.map(customer, RegistrationRequest.class);
+            registrationService.register(registrationRequest, Role.ROLE_CUSTOMER);
+        } catch (Exception e){
+            throw new NotFoundException("there is problem with email verification" + e.getMessage());
+        }
+            return savedCustomer;
     }
+
+//    public String confirmSaveCustomer(Customer customer){
+//
+//    }
 
     @Transactional
     @Override

@@ -39,7 +39,7 @@ public class RegistrationService {
 
             //Since, we are running the spring boot application in localhost, we are hardcoding the
             //url of the server. We are creating a POST request with token param
-            String link = "http://localhost:8080/api/v1/registration/confirm?token=" + tokenForNewUser;
+            String link = "http://localhost:8080/registration/confirm?token=" + tokenForNewUser;
             emailSender.sendEmail(request.getEmail(), buildEmail(request.getFirstName(), link));
             return tokenForNewUser;
         } else {

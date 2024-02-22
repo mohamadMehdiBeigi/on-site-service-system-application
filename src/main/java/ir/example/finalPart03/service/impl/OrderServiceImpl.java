@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Transactional
@@ -212,72 +213,195 @@ public class OrderServiceImpl implements OrderService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<Order> getUserOrderHistory(Long userId, Class<?> userType) {
+
+    @Override
+    public List<Order> getUserOrderHistory(Long userId, Class<?> userType, Map<String, String> param) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Order> query = cb.createQuery(Order.class);
         Root<Order> orderRoot = query.from(Order.class);
+        Join<Order, Users> userJoin = orderRoot.join("customer", JoinType.LEFT);
+        Join<Order, Users> specialistJoin = orderRoot.join("subServices", JoinType.LEFT).join("specialists", JoinType.LEFT);
 
-        Join<Order, Customer> customerJoin;
-        Join<Order, Specialist> specialistJoin;
+        query.select(orderRoot);
 
-        if (userType.equals(Customer.class)) {
-            customerJoin = orderRoot.join("customer");
-            query.where(cb.equal(customerJoin.get("id"), userId));
-        } else if (userType.equals(Specialist.class)) {
-            specialistJoin = orderRoot.join("subServices").join("specialists");
-            query.where(cb.equal(specialistJoin.get("id"), userId));
-        }
-
-        return entityManager.createQuery(query.select(orderRoot)).getResultList();
-    }
-
-    public List<Order> getOrdersByParameters(LocalDateTime startDate, LocalDateTime endDate, OrderStatus status, String serviceName, String subServiceName) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Order> query = cb.createQuery(Order.class);
-        Root<Order> orderRoot = query.from(Order.class);
         List<Predicate> predicates = new ArrayList<>();
 
-        if (startDate != null && endDate != null) {
+        if (userType != null && Customer.class.isAssignableFrom(userType)) {
+            predicates.add(cb.equal(userJoin.get("id"), userId));
+        } else if (userType != null && Specialist.class.isAssignableFrom(userType)) {
+            predicates.add(cb.equal(specialistJoin.get("id"), userId));
+        }
+
+        if (param.containsKey("startDate") &&
+                param.containsKey("endDate") &&
+                param.get("startDate") != null &&
+                param.get("endDate") != null) {
+            LocalDateTime startDate = LocalDateTime.parse(param.get("startDate"));
+            LocalDateTime endDate = LocalDateTime.parse(param.get("endDate"));
             predicates.add(cb.between(orderRoot.get("startDayOfWork"), startDate, endDate));
         }
-        if (status != null) {
+        if (param.containsKey("status") && param.get("status") != null) {
+            OrderStatus status = OrderStatus.valueOf(param.get("status"));
             predicates.add(cb.equal(orderRoot.get("orderStatus"), status));
         }
-        if (serviceName != null && !serviceName.isEmpty()) {
-            predicates.add(cb.equal(orderRoot.get("subServices").get("services").get("serviceName"), serviceName));
+        if (param.containsKey("serviceName") && param.get("serviceName") != null) {
+            predicates.add(cb.equal(orderRoot.get("subServices").get("services").get("serviceName"), param.get("serviceName")));
         }
-        if (subServiceName != null && !subServiceName.isEmpty()) {
-            predicates.add(cb.equal(orderRoot.get("subServices").get("subServiceName"), subServiceName));
+        if (param.containsKey("subServiceName") && param.get("subServiceName") != null) {
+            predicates.add(cb.equal(orderRoot.get("subServices").get("subServiceName"), param.get("subServiceName")));
         }
 
         query.where(predicates.toArray(new Predicate[0]));
+
         return entityManager.createQuery(query).getResultList();
     }
 
-    public Long getUserOrdersCount(Long userId, Class<?> userType) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        // Criteria to count the number of orders
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        Root<Order> orderRoot = countQuery.from(Order.class);
-        countQuery.select(cb.count(orderRoot));
+    @Override
+    public Long countOrdersByCriteria(Long entityId, Class<?> userType) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        Root<Order> orderRoot = criteriaQuery.from(Order.class);
+        Join<Order, Users> specialistJoin = orderRoot.join("subServices", JoinType.LEFT).join("specialists", JoinType.LEFT);
 
+        criteriaQuery.select(criteriaBuilder.count(specialistJoin));
+
+        Predicate typePredicate;
         if (Customer.class.isAssignableFrom(userType)) {
-            // Count orders for Customer
-            countQuery.where(cb.equal(orderRoot.get("customer").get("id"), userId));
-        } else if (Specialist.class.isAssignableFrom(userType)) {
-            // Count orders for Specialist with status PAID
-            Join<Order, SubServices> subServicesJoin = orderRoot.join("subServices");
-            Join<SubServices, Specialist> specialistJoin = subServicesJoin.join("specialists");
-            countQuery.where(cb.and(
-                    cb.equal(specialistJoin.get("id"), userId),
-                    cb.equal(orderRoot.get("orderStatus"), OrderStatus.PAID)
-            ));
-        } else {
-            throw new IllegalArgumentException("Invalid user type provided");
-        }
+            typePredicate = criteriaBuilder.equal(orderRoot.get("customer").get("id"), entityId);
+            criteriaQuery.where(typePredicate);
 
-        return entityManager.createQuery(countQuery).getSingleResult();
+            return entityManager.createQuery(criteriaQuery).getSingleResult();
+
+        } else if (Specialist.class.isAssignableFrom(userType)) {
+            typePredicate = criteriaBuilder.equal(specialistJoin.get("id"), entityId);
+            Predicate statusPredicate = criteriaBuilder.equal(orderRoot.get("orderStatus"), OrderStatus.DONE);
+
+            criteriaQuery.where(typePredicate, statusPredicate);
+
+            return entityManager.createQuery(criteriaQuery).getSingleResult();
+
+        } else {
+            throw new IllegalArgumentException("Unsupported user type");
+        }
     }
+
+    @Override
+    public List<Order> findAllOrdersByCustomerIdAndOrderStatus(Long customerId, String orderStatus) {
+        try {
+            OrderStatus byTitle = OrderStatus.findByTitle(orderStatus);
+
+            return orderRepository.findAllByCustomerIdAndOrderStatus(customerId, byTitle);
+
+        } catch (Exception e) {
+            throw new BadRequestException("there is no orders data with this customerId");
+        }
+    }
+
+    @Override
+    public List<Order> findAllOrderBySpecialistIdAndOrderStatus(Long specialistId, String orderStatus) {
+        try {
+            OrderStatus byTitle = OrderStatus.findByTitle(orderStatus);
+
+            return orderRepository.findAllBySpecialistIdAndOrderStatus(specialistId, byTitle);
+
+        } catch (Exception e) {
+            throw new BadRequestException("there is no orders data with this specialistId");
+        }
+    }
+
+
+    //    public List<Order> getOrdersByUserId(Class<?> userType, Long userId) {
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Order> query = cb.createQuery(Order.class);
+//        Root<Order> orderRoot = query.from(Order.class);
+//        Join<Order, Users> userJoin = orderRoot.join("customer", JoinType.LEFT);  // Joining with customer
+//        Join<Order, Users> specialistJoin = orderRoot.join("specialist", JoinType.LEFT);  // Joining with specialist
+//
+//        query.select(orderRoot);
+//
+//        Predicate predicate = null;
+//        if (userType != null && Customer.class.isAssignableFrom(userType)) {
+//            predicate = cb.equal(userJoin.get("id"), userId);
+//        } else if (userType != null && Specialist.class.isAssignableFrom(userType)) {
+//            predicate = cb.equal(specialistJoin.get("id"), userId);
+//        } else {
+//            // No user type specified, do not apply any additional filter
+//        }
+//
+//        if (predicate != null) {
+//            query.where(predicate);
+//        }
+//
+//        return entityManager.createQuery(query).getResultList();
+//    }
+
+//    public List<Order> getOrdersByParameters(LocalDateTime startDate, LocalDateTime endDate, OrderStatus status, String serviceName, String subServiceName) {
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Order> query = cb.createQuery(Order.class);
+//        Root<Order> orderRoot = query.from(Order.class);
+//        List<Predicate> predicates = new ArrayList<>();
+//
+//        if (startDate != null && endDate != null) {
+//            predicates.add(cb.between(orderRoot.get("startDayOfWork"), startDate, endDate));
+//        }
+//        if (status != null) {
+//            predicates.add(cb.equal(orderRoot.get("orderStatus"), status));
+//        }
+//        if (serviceName != null && !serviceName.isEmpty()) {
+//            predicates.add(cb.equal(orderRoot.get("subServices").get("services").get("serviceName"), serviceName));
+//        }
+//        if (subServiceName != null && !subServiceName.isEmpty()) {
+//            predicates.add(cb.equal(orderRoot.get("subServices").get("subServiceName"), subServiceName));
+//        }
+//
+//        query.where(predicates.toArray(new Predicate[0]));
+//        return entityManager.createQuery(query).getResultList();
+//    }
+
+//    public Long getUserOrdersCount(Long userId, Class<?> userType) {
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//
+//        // Criteria to count the number of orders
+//        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+//        Root<Order> orderRoot = countQuery.from(Order.class);
+//        countQuery.select(cb.count(orderRoot));
+//
+//        if (Customer.class.isAssignableFrom(userType)) {
+//            // Count orders for Customer
+//            countQuery.where(cb.equal(orderRoot.get("customer").get("id"), userId));
+//        } else if (Specialist.class.isAssignableFrom(userType)) {
+//            // Count orders for Specialist with status PAID
+//            Join<Order, SubServices> subServicesJoin = orderRoot.join("subServices");
+//            Join<SubServices, Specialist> specialistJoin = subServicesJoin.join("specialists");
+//            countQuery.where(cb.and(
+//                    cb.equal(specialistJoin.get("id"), userId),
+//                    cb.equal(orderRoot.get("orderStatus"), OrderStatus.PAID)
+//            ));
+//        } else {
+//            throw new IllegalArgumentException("Invalid user type provided");
+//        }
+//
+//        return entityManager.createQuery(countQuery).getSingleResult();
+//    }
+
+//    public List<Order> getUserOrderHistory(Long userId, Class<?> userType) {
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Order> query = cb.createQuery(Order.class);
+//        Root<Order> orderRoot = query.from(Order.class);
+//
+//        Join<Order, Customer> customerJoin;
+//        Join<Order, Specialist> specialistJoin;
+//
+//        if (userType.equals(Customer.class)) {
+//            customerJoin = orderRoot.join("customer");
+//            query.where(cb.equal(customerJoin.get("id"), userId));
+//        } else if (userType.equals(Specialist.class)) {
+//            specialistJoin = orderRoot.join("subServices").join("specialists");
+//            query.where(cb.equal(specialistJoin.get("id"), userId));
+//        }
+//
+//        return entityManager.createQuery(query.select(orderRoot)).getResultList();
+//    }
 
 }

@@ -98,9 +98,9 @@ public class BankAccountServiceImpl implements BankAccountService {
         BankAccount bankAccount = bankAccountRepository.findBySpecialistId(specialistId)
                 .orElseThrow(() -> new NotFoundException("this specialist id is not exist"));
 
-            Double deductedDepositAmount = depositAmount * 0.7;
-            double finalBalance = bankAccount.getBalance() + deductedDepositAmount;
-            bankAccount.setBalance(finalBalance);
+        Double deductedDepositAmount = depositAmount * 0.7;
+        double finalBalance = bankAccount.getBalance() + deductedDepositAmount;
+        bankAccount.setBalance(finalBalance);
 
         try {
             bankAccountRepository.save(bankAccount);
@@ -116,5 +116,16 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .orElseThrow(() -> new NotFoundException("there is no bank account with this inputs"));
     }
 
+    @Override
+    public BankAccount findBankAccBySpecialistId(Long specialist) {
+        return bankAccountRepository.findBySpecialistId(specialist)
+                .orElseThrow(() -> new NotFoundException("there is no bank account by specialist id"));
+    }
+
+    @Override
+    public BankAccount findBankAccByCustomerId(Long customerId) {
+        return bankAccountRepository.findByCustomerId(customerId)
+                .orElseThrow(() -> new NotFoundException("there is no bank account by customer id"));
+    }
 
 }

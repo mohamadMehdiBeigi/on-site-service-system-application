@@ -1,7 +1,6 @@
 package ir.example.finalPart03.model;
 
 
-import ir.example.finalPart03.config.PasswordGenerator;
 import ir.example.finalPart03.model.baseModel.BaseEntity;
 import ir.example.finalPart03.model.enums.Role;
 import ir.example.finalPart03.util.validations.ValidLocalDateTime;
@@ -102,10 +101,12 @@ public class Users extends BaseEntity<Long> implements UserDetails {
 
     @PrePersist
     private void preparePasswordAndOthers() {
-        if (password == null || password.isEmpty()) {
-            PasswordGenerator generator = new PasswordGenerator(8);
-            this.password = generator.nextPassword();
-        }
+//        if (password == null || password.isEmpty()) {
+//            PasswordGenerator generator = new PasswordGenerator(8);
+//            this.password = generator.nextPassword();
+//        }
         this.signupDate = LocalDateTime.now();
+        this.enabled = false;
+        this.locked = false;
     }
 }

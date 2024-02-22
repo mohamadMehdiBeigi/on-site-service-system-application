@@ -3,9 +3,11 @@ package ir.example.finalPart03.service.impl;
 import ir.example.finalPart03.config.exceptions.BadRequestException;
 import ir.example.finalPart03.config.exceptions.DuplicateException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
+import ir.example.finalPart03.model.Order;
 import ir.example.finalPart03.model.Services;
 import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.model.SubServices;
+import ir.example.finalPart03.repository.OrderRepository;
 import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SubServicesRepository;
 import ir.example.finalPart03.service.SubServiceService;
@@ -25,6 +27,8 @@ public class SubServicesServiceImpl implements SubServiceService {
     private final SubServicesRepository subServicesRepository;
 
     private final SpecialistRepository specialistRepository;
+
+    private final OrderRepository orderRepository;
 
 
     @Override
@@ -84,12 +88,30 @@ public class SubServicesServiceImpl implements SubServiceService {
     }
 
     @Override
-    public void deleteSubServiceById(Long subServiceId) {
-        try {
-            subServicesRepository.deleteById(subServiceId);
-        } catch (Exception e) {
-            throw new RuntimeException("cant delete subService,please enter valid id \n" + e.getMessage());
+    public List<SubServices> findAllSubService() {
+        return subServicesRepository.findAll();
+    }
+
+    @Override
+    public void deleteSubService(Long subServiceId) {
+
+        SubServices subService = subServicesRepository.findById(subServiceId)
+                .orElseThrow(() -> new EntityNotFoundException("SubService not found with id: " + subServiceId));
+
+        Set<Specialist> specialists = subService.getSpecialists();
+
+        for (Specialist specialist : specialists) {
+            specialist.getSubServices().remove(subService);
+            specialistRepository.save(specialist);
         }
+
+        List<Order> allOrdersBySubServicesId = orderRepository.findAllBySubServicesId(subServiceId);
+        for (Order order : allOrdersBySubServicesId) {
+            order.setSubServices(null);
+            orderRepository.save(order);
+        }
+
+        subServicesRepository.delete(subService);
     }
 
     @Override
@@ -119,7 +141,7 @@ public class SubServicesServiceImpl implements SubServiceService {
             specialistRepository.save(specialist);
 
         } catch (Exception e) {
-            throw new BadRequestException("cant delete this subservice \n" + e.getMessage());
+            throw new BadRequestException("cant delete this subService \n" + e.getMessage());
         }
     }
 

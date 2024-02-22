@@ -23,7 +23,9 @@ public class FinalPart03Application {
 //        OrderService orderService = run.getBean(OrderService.class);
 //        ServicesService servicesService = run.getBean(ServicesService.class);
 //        SpecialistService specialistService = run.getBean(SpecialistService.class);
+//        specialistService.deleteSpecialist(2L);
 //        SubServiceService subServiceService = run.getBean(SubServiceService.class);
+//        subServiceService.deleteSubService(1L);
 //        SuggestionService suggestionService = run.getBean(SuggestionService.class);
 //        Customer customer = new Customer("aaa", "sss", "sss@gma.com", null, LocalDateTime.now(), 1.0);
 //        Customer customer1 = new Customer();
@@ -80,6 +82,7 @@ public class FinalPart03Application {
 //        Specialist byId = specialistService.findById(2L);
 //        System.out.println(byId.getAverageScores());
 
-
+//        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+//        System.out.println(bCryptPasswordEncoder.encode("1234mn"));
     }
 }

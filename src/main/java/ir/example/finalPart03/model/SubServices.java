@@ -30,10 +30,10 @@ public class SubServices extends BaseEntity<Long> implements Serializable {
 
     String description;
 
-    @ManyToOne(optional = false, cascade = CascadeType.REMOVE)
+    @ManyToOne
     Services services;
 
-    @ManyToMany(mappedBy = "subServices", cascade = CascadeType.REMOVE)
+    @ManyToMany(mappedBy = "subServices")
     Set<Specialist> specialists;
 
 

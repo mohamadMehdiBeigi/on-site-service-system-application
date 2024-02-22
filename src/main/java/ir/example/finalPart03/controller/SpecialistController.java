@@ -1,42 +1,57 @@
 package ir.example.finalPart03.controller;
 
-import ir.example.finalPart03.dto.specialistDto.SpecialistRequestDto;
+import ir.example.finalPart03.dto.bankAccountDto.BankAccountResponseDto;
+import ir.example.finalPart03.dto.commentDto.CommentsResponseDto;
+import ir.example.finalPart03.dto.orderDto.OrderResponseDto;
 import ir.example.finalPart03.dto.specialistDto.SpecialistResponseDto;
-import ir.example.finalPart03.model.Specialist;
-import ir.example.finalPart03.service.SpecialistService;
-import lombok.AllArgsConstructor;
+import ir.example.finalPart03.dto.suggestionDto.SuggestionRequestDto;
+import ir.example.finalPart03.dto.suggestionDto.SuggestionResponseDto;
+import ir.example.finalPart03.model.*;
+import ir.example.finalPart03.service.*;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
-@AllArgsConstructor
+@RequestMapping("/specialist")
+@RequiredArgsConstructor
 public class SpecialistController {
 
-    private SpecialistService specialistService;
+    private final SpecialistService specialistService;
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    @PostMapping("/specialist/save")
-    public ResponseEntity<SpecialistResponseDto> saveSpecialist(@RequestBody SpecialistRequestDto specialistRequestDto) {
-        Specialist specialist = modelMapper.map(specialistRequestDto, Specialist.class);
-        Specialist saveSpecialist = specialistService.saveSpecialist(specialist);
-        SpecialistResponseDto specialistResponseDto = modelMapper.map(saveSpecialist, SpecialistResponseDto.class);
-        return new ResponseEntity<>(specialistResponseDto, HttpStatus.CREATED);
+    private final SuggestionService suggestionService;
+
+    private final OrderService orderService;
+
+    private final BankAccountService bankAccountService;
+
+    private final CommentService commentService;
+
+    @PostMapping("/saveSuggestion")
+    public ResponseEntity<SuggestionResponseDto> saveSuggestion(@RequestBody SuggestionRequestDto suggestionRequestDto) {
+        Suggestions suggestions = SuggestionRequestDto.dtoToSuggestion(suggestionRequestDto);
+        Suggestions saveSuggestion = suggestionService.saveSuggestion(suggestions, suggestionRequestDto.getOrderId(), suggestionRequestDto.getSpecialistId());
+        SuggestionResponseDto suggestionResponseDto = SuggestionResponseDto.suggestionToResponseDto(saveSuggestion);
+        return new ResponseEntity<>(suggestionResponseDto, HttpStatus.CREATED);
     }
 
-
-    @PutMapping("/specialist/confirmingSpecialStatus/{specialistId}")
+    @PutMapping("/confirmingSpecialStatus/{specialistId}")
     public ResponseEntity<Void> confirmingSpecialStatus(@PathVariable Long specialistId) {
         specialistService.confirmingSpecialStatus(specialistId);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/specialist/saveImageToFile/{specialistId}")
+    @PostMapping("/saveImageToFile/{specialistId}")
     public ResponseEntity<String> saveImageToFile(@PathVariable Long specialistId) {
         specialistService.saveImageToFile(specialistId);
-        return ResponseEntity.ok("successfully adding" + specialistId + "image to 'src\\main\\resources\\extractedImage'");
+        return ResponseEntity.ok("successfully added");
     }
 
     @PutMapping("/specialist/{oldPassword}/changePassword/{specialistId}/{password}/{confirmingPassword}")
@@ -58,4 +73,90 @@ public class SpecialistController {
         SpecialistResponseDto specialistResponseDto = modelMapper.map(specialist, SpecialistResponseDto.class);
         return new ResponseEntity<>(specialistResponseDto, HttpStatus.OK);
     }
+
+    @GetMapping("/findAllByCustomerIdOrOrderBySuggestedPrice/{customerId}")
+    public ResponseEntity<List<SuggestionResponseDto>> findAllByCustomerIdOrOrderBySuggestedPrice(@PathVariable Long customerId) {
+        List<Suggestions> allByCustomerIdOrOrderBySuggestedPrice = suggestionService.findAllByCustomerIdOrOrderBySuggestedPrice(customerId);
+        List<SuggestionResponseDto> suggestionResponseDtoList = new ArrayList<>();
+        for (Suggestions suggestion :
+                allByCustomerIdOrOrderBySuggestedPrice) {
+            SuggestionResponseDto suggestionResponseDto = modelMapper.map(suggestion, SuggestionResponseDto.class);
+            suggestionResponseDtoList.add(suggestionResponseDto);
+        }
+        return new ResponseEntity<>(suggestionResponseDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/seeScoreBySpecialistId/{specialistId}")
+    public ResponseEntity<List<Double>> findAllScoresBySpecialistId(@PathVariable Long specialistId) {
+        List<Comments> allBySpecialistId = commentService.findAllBySpecialistId(specialistId);
+
+        List<CommentsResponseDto> commentsResponseDtoList = new ArrayList<>();
+
+        for (Comments c : allBySpecialistId) {
+            CommentsResponseDto commentsResponseDto = modelMapper.map(c, CommentsResponseDto.class);
+            commentsResponseDtoList.add(commentsResponseDto);
+        }
+        List<Double> collect = commentsResponseDtoList.stream().map(CommentsResponseDto::getScore).toList();
+        return ResponseEntity.accepted().body(collect);
+    }
+
+    @GetMapping("/findAllByCustomerIdOrOrderByTotalScores/{customerId}")
+    public ResponseEntity<List<SuggestionResponseDto>> findAllByCustomerIdOrOrderByTotalScores(@PathVariable Long customerId) {
+        List<Suggestions> allByCustomerIdOrOrderByTotalScores = suggestionService.findAllByCustomerIdOrOrderByTotalScores(customerId);
+        List<SuggestionResponseDto> suggestionResponseDtoList = new ArrayList<>();
+        for (Suggestions suggestion :
+                allByCustomerIdOrOrderByTotalScores) {
+            SuggestionResponseDto suggestionResponseDto = modelMapper.map(suggestion, SuggestionResponseDto.class);
+            suggestionResponseDtoList.add(suggestionResponseDto);
+        }
+        return ResponseEntity.ok(suggestionResponseDtoList);
+    }
+
+    @GetMapping("/findOrder/{orderId}")
+    public ResponseEntity<OrderResponseDto> findById(@PathVariable Long orderId) {
+        Order order = orderService.findById(orderId);
+        OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
+        return ResponseEntity.ok(orderResponseDto);
+    }
+
+    @GetMapping("/findAvailableOrdersForSpecialist/{specialistId}")
+    public ResponseEntity<List<OrderResponseDto>> findAvailableOrdersForSpecialist(@PathVariable Long specialistId) {
+        List<Order> availableOrdersForSpecialist = orderService.findAvailableOrdersForSpecialist(specialistId);
+        List<OrderResponseDto> orderResponseDtoList = new ArrayList<>();
+        for (Order order : availableOrdersForSpecialist) {
+            OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
+            orderResponseDtoList.add(orderResponseDto);
+        }
+        return ResponseEntity.ok(orderResponseDtoList);
+    }
+
+    @GetMapping("/findAllByOrderStatusAndSpecialistId/{specialistId}")
+    public ResponseEntity<List<OrderResponseDto>> findAllByOrderStatusAndSpecialistId(@PathVariable Long specialistId) {
+        List<Order> allByOrderStatusAndSpecialistId = orderService.findAllByOrderStatusAndSpecialistId(specialistId);
+        List<OrderResponseDto> orderResponseDtosList = new ArrayList<>();
+        for (Order order : allByOrderStatusAndSpecialistId) {
+            OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
+            orderResponseDtosList.add(orderResponseDto);
+        }
+        return ResponseEntity.ok(orderResponseDtosList);
+    }
+
+    @GetMapping("/findAllOrderBySpecialistIdAndOrderStatus/{customerId}/{orderStatus}")
+    public ResponseEntity<List<OrderResponseDto>> findAllOrderBySpecialistIdAndOrderStatus(@PathVariable Long customerId, @PathVariable String orderStatus) {
+        List<OrderResponseDto> orderResponseDtoList = new ArrayList<>();
+        List<Order> orderList = orderService.findAllOrderBySpecialistIdAndOrderStatus(customerId, orderStatus);
+        for (Order order : orderList) {
+            OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
+            orderResponseDtoList.add(orderResponseDto);
+        }
+        return new ResponseEntity<>(orderResponseDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/findBankAccount/{specialistId}")
+    public ResponseEntity<BankAccountResponseDto> findBankAccountByCustomerId(@PathVariable Long specialistId) {
+        BankAccount bankAccBySpecialistId = bankAccountService.findBankAccBySpecialistId(specialistId);
+        BankAccountResponseDto bankAccountResponseDto = modelMapper.map(bankAccBySpecialistId, BankAccountResponseDto.class);
+        return new ResponseEntity<>(bankAccountResponseDto, HttpStatus.OK);
+    }
+
 }

@@ -19,4 +19,5 @@ BankAccountRepository extends JpaRepository<BankAccount, Long> {
     Optional<BankAccount> findBySpecialistId(Long specialistId);
 
     Optional<BankAccount> findByBankAccountNumberAndCvv2AndExpiryDateAndPassword(String bankAccountNumber, Integer cvv2, LocalDate expiryDate, String password);
+
 }

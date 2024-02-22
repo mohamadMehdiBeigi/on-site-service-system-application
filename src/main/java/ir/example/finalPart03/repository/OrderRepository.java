@@ -13,7 +13,10 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("select o from Order o where o.subServices in (select ss from SubServices ss join ss.specialists s where s.id = :specialistId)")
+    @Query("select o " +
+            "from Order o " +
+            "where o.subServices " +
+            "in (select ss from SubServices ss join ss.specialists s where s.id = :specialistId)")
     List<Order> findOrdersBySpecialistSubServicesAndStatus(@Param("specialistId") Long specialistId);
 
     @Query(nativeQuery = true, value =
@@ -39,4 +42,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findAllByOrderStatus(OrderStatus orderStatus);
 
+    List<Order> findAllBySubServicesId(Long subServiceId);
+
+    @Query(" from Order o where o.customer.id =:customerId and o.orderStatus=:orderStatus")
+    List<Order> findAllByCustomerIdAndOrderStatus(Long customerId, OrderStatus orderStatus);
+
+    @Query("select e from Order e \n" +
+            "left join e.subServices ss \n" +
+            "left join ss.specialists s \n" +
+            "where s.id = :specialistId \n" +
+            "and e.orderStatus = :orderStatus")
+    List<Order> findAllBySpecialistIdAndOrderStatus(Long specialistId, OrderStatus orderStatus);
 }

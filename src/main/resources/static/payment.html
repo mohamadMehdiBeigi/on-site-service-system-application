@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -17,7 +17,7 @@
                             <p class="mb-0"></p>
                         </div>
                     </div>
-                    <div class="rounded-bottom" style="background-color: chocolate">
+                    <div class="rounded-bottom" style="background-color: cadetblue">
                         <div class="card-body">
                             <h4 class="card-title">Order ID: <span id="orderId"></span></h4>
                             <h4 class="card-title">Price: <span id="price"></span></h4>
@@ -96,7 +96,7 @@
 
     // Function to fetch and display CAPTCHA
     function loadCaptcha() {
-        fetch('http://localhost:8080/api/captcha')
+        fetch('http://localhost:8080/customer/captcha')
             .then(response => response.text())
             .then(captchaText => {
                 document.getElementById('captchaLoad').value = captchaText;
@@ -123,7 +123,7 @@
         };
 
         // Verify CAPTCHA before making the payment request
-        fetch('http://localhost:8080/api/verify-captcha', {
+        fetch('http://localhost:8080/customer/verify-captcha', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -133,7 +133,7 @@
             .then(response => {
                 if (response.ok) {
                     // Assuming the captcha was correct, now send the whole data for the payment
-                    return fetch('http://localhost:8080/payment-getaway/online/finalPaymentFromOnlineGateway', {
+                    return fetch('http://localhost:8080/customer/online/finalPaymentFromOnlineGateway', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'

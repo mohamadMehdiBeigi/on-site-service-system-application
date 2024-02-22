@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional
 @Service
 @RequiredArgsConstructor
@@ -55,5 +57,10 @@ public class ServicesServiceImpl implements ServicesService {
         } catch (Exception e) {
             throw new BadRequestException("cant delete service data,try again." + e.getMessage());
         }
+    }
+
+    @Override
+    public List<Services> findAll(){
+        return servicesRepository.findAll();
     }
 }

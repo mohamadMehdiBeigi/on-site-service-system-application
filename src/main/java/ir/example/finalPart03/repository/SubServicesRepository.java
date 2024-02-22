@@ -32,4 +32,6 @@ public interface SubServicesRepository extends JpaRepository<SubServices, Long> 
     @Query("delete from SubServices s where s.services.id = :serviceId")
     void removeSubServiceRelationalByServiceId(Long serviceId);
 
+
+    List<SubServices> findAllBySpecialistsId(Long specialistId);
 }

@@ -1,5 +1,6 @@
 package ir.example.finalPart03.dto.specialistDto;
 
+import ir.example.finalPart03.model.enums.Role;
 import ir.example.finalPart03.model.enums.SpecialistStatus;
 
 import java.time.LocalDateTime;
@@ -20,17 +21,18 @@ public class SpecialistResponseDto {
 
     private SpecialistStatus specialistStatus;
 
-    public SpecialistResponseDto(Long id, String firstname, String lastname, String email, byte[] image, LocalDateTime signupDate, Double averageScores, SpecialistStatus specialistStatus) {
-        this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.signupDate = signupDate;
-        this.averageScores = averageScores;
-        this.specialistStatus = specialistStatus;
-    }
+    private Role role;
+
 
     public SpecialistResponseDto() {
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public Long getId() {
