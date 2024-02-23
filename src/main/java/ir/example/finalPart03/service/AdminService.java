@@ -12,9 +12,5 @@ public interface AdminService {
 
     Boolean checkUniqueEmail(String email);
 
-//    List<Specialist> findAllSpecialistsByCriteria(Map<String, String > param);
-//
-//    List<Customer> findAllCustomerByCriteria(Map<String, String > param);
-
     List findAllUsersByCriteriaFinal(Class<?> userType, Map<String, String> param);
 }

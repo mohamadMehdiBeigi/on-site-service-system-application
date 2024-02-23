@@ -4,9 +4,6 @@ import ir.example.finalPart03.model.BankAccount;
 
 public interface BankAccountService {
 
-//    Double orderPaymentByCustomerFromCredit(Long customerId, Double paymentAmount);
-
-//    void depositToSpecialistBalance(Long specialistId, Double depositAmount);
 
     BankAccount saveBankAccount(BankAccount bankAccount, Long specialistId, Long customerId);
 

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,12 +27,8 @@ public class UsersServiceImpl implements UsersService, UserDetailsService {
     private final ConfirmationTokenService confirmationTokenService;
 
 
-//    @Override
-//    public Optional<Users> findByEmail(String email) {
-//        return usersRepository.findByEmail(email);
-//    }
-
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User with email %s not found", email)));

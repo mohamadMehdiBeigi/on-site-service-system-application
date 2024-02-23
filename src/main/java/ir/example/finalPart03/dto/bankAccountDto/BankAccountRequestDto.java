@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Setter
 public class BankAccountRequestDto {
 
+    @Pattern(regexp = "^(589463|627353|628023)\\d{10}$", message = "either this bank is not exist nor you must enter 16 number")
     private String bankAccountNumber;
 
     private Integer cvv2;
@@ -22,6 +24,7 @@ public class BankAccountRequestDto {
 
     private Integer month;
 
+    @Pattern(regexp = "^\\S+$", message = "password cant have space.")
     private String password;
 
     private Long orderId;

@@ -1,6 +1,5 @@
 package ir.example.finalPart03.security;
 
-import ir.example.finalPart03.repository.UsersRepository;
 import ir.example.finalPart03.service.impl.UsersServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,8 +20,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-
-    private final UsersRepository usersRepository;
 
     private final UsersServiceImpl usersServiceImpl;
 
@@ -35,7 +31,6 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(a -> a
-//                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/registration/**").permitAll()
                         .requestMatchers("/specialist/**").hasRole("SPECIALIST")
                         .requestMatchers("/customer/**").hasRole("CUSTOMER")
@@ -45,13 +40,18 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    private final UserDetailsService userDetailsService;
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService((email) -> usersRepository.findByEmail(email)
-                        .orElseThrow(() -> new UsernameNotFoundException(String.format("this %s is notFound!", email))))
-                .passwordEncoder(passwordEncoder);
-
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
+// this is for alternative way to call findByEmail method :
+
+//        auth.userDetailsService((email) -> usersRepository.findByEmail(email)
+//                        .orElseThrow(() -> new UsernameNotFoundException(String.format("this %s is notFound!", email))))
+//                .passwordEncoder(passwordEncoder);
+
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -61,7 +61,7 @@ public class SecurityConfiguration {
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder); // این باید مستقیما به `PasswordEncoder` موجود وصل شود.
+        provider.setPasswordEncoder(passwordEncoder);
         provider.setUserDetailsService(usersServiceImpl);
         return provider;
     }

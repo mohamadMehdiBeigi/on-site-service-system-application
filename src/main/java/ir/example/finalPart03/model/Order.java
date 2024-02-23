@@ -12,8 +12,7 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-//@Getter
-//@Setter
+@SuppressWarnings("unused")
 @AllArgsConstructor
 @Entity
 @SuperBuilder

@@ -8,7 +8,6 @@ import ir.example.finalPart03.model.Suggestions;
 import ir.example.finalPart03.model.baseModel.BaseEntity;
 import ir.example.finalPart03.model.enums.OrderStatus;
 import ir.example.finalPart03.repository.OrderRepository;
-import ir.example.finalPart03.repository.SpecialistRepository;
 import ir.example.finalPart03.repository.SuggestionsRepository;
 import ir.example.finalPart03.service.SuggestionService;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +24,6 @@ public class SuggestionsServiceImpl implements SuggestionService {
     private final SuggestionsRepository suggestionsRepository;
 
     private final OrderRepository orderRepository;
-
-    private final SpecialistRepository specialistRepository;
 
 
     @Transactional
@@ -51,7 +48,7 @@ public class SuggestionsServiceImpl implements SuggestionService {
         List<Order> allByOrderStatusAndSpecialistId = orderRepository.findAllByOrderStatusAndSpecialistId(specialistId);
 
         List<Long> collect = allByOrderStatusAndSpecialistId.stream().map(BaseEntity::getId).toList();
-        if (!collect.contains(order.getId())) {
+        if (collect.isEmpty()) {
             throw new BadRequestException("you must only select Orders that are related to you");
         }
 

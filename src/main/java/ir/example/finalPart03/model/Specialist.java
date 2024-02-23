@@ -21,7 +21,7 @@ public class Specialist extends Users {
     SpecialistStatus specialistStatus;
 
     @Lob
-    private byte[] image;
+    byte[] image;
 
     Double averageScores;
 

@@ -103,9 +103,9 @@ public class AdminController {
     @PostMapping("/getUserOrderHistory/{userType}/{userId}")
     public ResponseEntity<List<OrderResponseDto>> getUserOrderHistory(@PathVariable String userType, @PathVariable Long userId, @RequestBody Map<String, String> param) {
         Class<?> user = null;
-        if (userType.equals("Specialist")) {
+        if (userType.equalsIgnoreCase("Specialist")) {
             user = Specialist.class;
-        } else if (userType.equals("Customer")) {
+        } else if (userType.equalsIgnoreCase("Customer")) {
             user = Customer.class;
         }
         List<OrderResponseDto> orderResponseDtoList = new ArrayList<>();
@@ -129,30 +129,5 @@ public class AdminController {
     }
 
 
-    //    @PostMapping("/findAllSpecialistsByCriteria")
-//    //firstname - lastname - email - specialistField(select a serviceName) - averageScoresOrderBy(asc or desc)
-//    public List<SpecialistResponseDto> findAllSpecialistsByCriteria(@RequestBody Map<String, String> param) {
-//
-//        List<SpecialistResponseDto> criteriaSearchDtoList = new ArrayList<>();
-//        List<Specialist> allSpecialistsByCriteria = adminService.findAllSpecialistsByCriteria(param);
-//        for (Specialist s : allSpecialistsByCriteria
-//        ) {
-//            SpecialistResponseDto specialistResponseDto = modelMapper.map(s, SpecialistResponseDto.class);
-//            criteriaSearchDtoList.add(specialistResponseDto);
-//        }
-//        return criteriaSearchDtoList;
-//    }
-//
-//    @PostMapping("/findAllCustomerByCriteria")
-//    public List<CustomerResponseDto> findAllCustomerByCriteria(@RequestBody Map<String, String> param) {
-//        List<CustomerResponseDto> criteriaSearchDtoList = new ArrayList<>();
-//        List<Customer> allCustomerByCriteria = adminService.findAllCustomerByCriteria(param);
-//        for (Customer s : allCustomerByCriteria
-//        ) {
-//            CustomerResponseDto customerResponseDto = modelMapper.map(s, CustomerResponseDto.class);
-//            criteriaSearchDtoList.add(customerResponseDto);
-//        }
-//        return criteriaSearchDtoList;
-//    }
 
 }

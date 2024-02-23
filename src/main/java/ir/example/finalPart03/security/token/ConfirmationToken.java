@@ -9,7 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
-
+@SuppressWarnings("unused")
 @Entity
 @Table(schema = "final_part3")
 public class ConfirmationToken extends BaseEntity<Long> {

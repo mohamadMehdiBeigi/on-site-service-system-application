@@ -11,10 +11,7 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 import java.util.Set;
 
-//@Getter
-//@Setter
-//@AllArgsConstructor
-//@NoArgsConstructor
+
 @Entity
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)

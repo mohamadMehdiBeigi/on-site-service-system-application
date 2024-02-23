@@ -54,20 +54,20 @@ public class SpecialistController {
         return ResponseEntity.ok("successfully added");
     }
 
-    @PutMapping("/specialist/{oldPassword}/changePassword/{specialistId}/{password}/{confirmingPassword}")
+    @PutMapping("/changePassword/{specialistId}/{oldPassword}/{password}/{confirmingPassword}")
     public ResponseEntity<SpecialistResponseDto> changePassword(@PathVariable Long specialistId, @PathVariable String oldPassword, @PathVariable String password, @PathVariable String confirmingPassword) {
         Specialist specialist = specialistService.changePassword(specialistId, oldPassword, password, confirmingPassword);
         SpecialistResponseDto specialistResponseDto = modelMapper.map(specialist, SpecialistResponseDto.class);
         return ResponseEntity.ok(specialistResponseDto);
     }
 
-    @PutMapping("/specialist/addSubServiceToSpecialist/{specialistId}/{subServiceId}")
+    @PutMapping("/addSubServiceToSpecialist/{specialistId}/{subServiceId}")
     public ResponseEntity<Void> addSubServiceToSpecialist(@PathVariable Long specialistId, @PathVariable Long subServiceId) {
         specialistService.addSubServiceToSpecialist(specialistId, subServiceId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/specialist/seeAverageScore/{specialistId}")
+    @PutMapping("/seeAverageScore/{specialistId}")
     public ResponseEntity<SpecialistResponseDto> seeAverageScore(@PathVariable Long specialistId) {
         Specialist specialist = specialistService.seeAverageScore(specialistId);
         SpecialistResponseDto specialistResponseDto = modelMapper.map(specialist, SpecialistResponseDto.class);
@@ -141,10 +141,10 @@ public class SpecialistController {
         return ResponseEntity.ok(orderResponseDtosList);
     }
 
-    @GetMapping("/findAllOrderBySpecialistIdAndOrderStatus/{customerId}/{orderStatus}")
-    public ResponseEntity<List<OrderResponseDto>> findAllOrderBySpecialistIdAndOrderStatus(@PathVariable Long customerId, @PathVariable String orderStatus) {
+    @GetMapping("/findAllOrderBySpecialistIdAndOrderStatus/{specialistId}/{orderStatus}")
+    public ResponseEntity<List<OrderResponseDto>> findAllOrderBySpecialistIdAndOrderStatus(@PathVariable Long specialistId, @PathVariable String orderStatus) {
         List<OrderResponseDto> orderResponseDtoList = new ArrayList<>();
-        List<Order> orderList = orderService.findAllOrderBySpecialistIdAndOrderStatus(customerId, orderStatus);
+        List<Order> orderList = orderService.findAllOrderBySpecialistIdAndOrderStatus(specialistId, orderStatus);
         for (Order order : orderList) {
             OrderResponseDto orderResponseDto = modelMapper.map(order, OrderResponseDto.class);
             orderResponseDtoList.add(orderResponseDto);

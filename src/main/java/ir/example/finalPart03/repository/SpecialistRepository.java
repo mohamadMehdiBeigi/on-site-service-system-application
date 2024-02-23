@@ -44,5 +44,7 @@ public interface SpecialistRepository extends JpaRepository<Specialist, Long> {
                     "and u.id =:specialistId")
     Double avgSpecialistScoreBySpecialistId(Long specialistId);
 
+
+
 }
 

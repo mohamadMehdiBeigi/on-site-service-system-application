@@ -10,10 +10,6 @@ import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-//@Getter
-//@Setter
-//@AllArgsConstructor
-//@NoArgsConstructor
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")

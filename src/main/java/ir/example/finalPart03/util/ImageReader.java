@@ -11,10 +11,6 @@ import java.util.Objects;
 public class ImageReader {
     public static byte[] uploadProfilePicture(MultipartFile file, String firstname, String lastname, String email) throws IOException {
 
-//        if (filePath.contains(".jpg")) {
-////            File file = new File(filePath);
-//            Random random = new Random();
-//            int randomNumber = random.nextInt(9) + 1;
 
 //        String filePath = FilenameUtils.getExtension(file.getName());
         String fileAbsolutePath = new File(Objects.requireNonNull(file.getOriginalFilename())).getAbsolutePath();
@@ -27,6 +23,6 @@ public class ImageReader {
             throw new BadRequestException("The size of the photo is more than 300 KB.");
         }
 
-        return file.getBytes();
+        return file.getInputStream().readAllBytes();
     }
 }

@@ -29,4 +29,5 @@ public interface SpecialistService {
     Specialist findById(Long specialistId);
 
     void deleteSpecialist(Long specialistId);
+
 }

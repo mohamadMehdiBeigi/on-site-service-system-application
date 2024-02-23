@@ -25,7 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -79,8 +82,6 @@ public class SpecialistServiceImpl implements SpecialistService {
         } catch (Exception e) {
             throw new NotFoundException("there is problem with email verification");
         }
-
-
     }
 
     @Override
@@ -111,7 +112,7 @@ public class SpecialistServiceImpl implements SpecialistService {
     @Override
     public void saveImageToFile(Long id) {
         Specialist specialist = specialistRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("this id is not found!"));
+                .orElseThrow(() -> new NotFoundException("this id is not found!"));
         byte[] image = specialist.getImage();
         try (FileOutputStream fos = new FileOutputStream("C:\\Users\\Data\\IdeaProjects\\finalPart3\\src\\main\\resources\\extractedImage\\id_number" + id + ".jpg")) {
             fos.write(image);
@@ -126,12 +127,10 @@ public class SpecialistServiceImpl implements SpecialistService {
         if (!Objects.equals(password, confirmingPassword)) {
             throw new RuntimeException("password and confirming password is not the same");
         }
-        String encodeOldPassword = passwordEncoder.encode(oldPassword);
-
         Specialist specialist = specialistRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("this specialistId is not found!"));
 
-        if (!Objects.equals(encodeOldPassword, specialist.getPassword())) {
+        if (!Objects.equals(oldPassword, specialist.getPassword())) {
             throw new BadRequestException("your oldPassword is incorrect, please enter your valid old password \n");
         }
         String encode = passwordEncoder.encode(password);

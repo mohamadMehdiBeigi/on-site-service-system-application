@@ -61,9 +61,6 @@ public class CustomerServiceImpl implements CustomerService {
             return savedCustomer;
     }
 
-//    public String confirmSaveCustomer(Customer customer){
-//
-//    }
 
     @Transactional
     @Override
