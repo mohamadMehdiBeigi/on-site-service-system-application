@@ -23,12 +23,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    //    private final AdminService adminService;
-//
-//    private final SpecialistService specialistService;
-//
-//    private final CustomerService customerService;
-
     private final UsersRepository usersRepository;
 
     private final UsersServiceImpl usersServiceImpl;
@@ -41,30 +35,15 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/login").permitAll()
+//                        .requestMatchers("/login").permitAll()
                         .requestMatchers("/registration/**").permitAll()
-                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/specialist/**").hasRole("SPECIALIST")
+                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()).httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
-
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .cors(AbstractHttpConfigurer::disable)
-//                .authorizeRequests(authz -> authz
-//                        .requestMatchers("/api/v*/registration/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(withDefaults());
-//
-//        return http.build();
-//    }
-
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -86,13 +65,5 @@ public class SecurityConfiguration {
         provider.setUserDetailsService(usersServiceImpl);
         return provider;
     }
-
-
-    // این را فقط اضافه کنید اگر شما می‌خواهید روند ساخت `AuthenticationManagerBuilder` را سفارشی‌سازی کنید.
-//    @Bean
-//    public AuthenticationManagerBuilder authenticationManagerBuilder(DaoAuthenticationProvider daoAuthenticationProvider) {
-//        AuthenticationManagerBuilder builder = new AuthenticationManagerBuilder(null);
-//        builder.authenticationProvider(daoAuthenticationProvider);
-//        return builder;
-//    }
 }
+

@@ -5,7 +5,9 @@ import ir.example.finalPart03.config.exceptions.DuplicateException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
 import ir.example.finalPart03.model.BankAccount;
 import ir.example.finalPart03.model.Customer;
+import ir.example.finalPart03.model.Order;
 import ir.example.finalPart03.model.Specialist;
+import ir.example.finalPart03.model.enums.OrderStatus;
 import ir.example.finalPart03.repository.BankAccountRepository;
 import ir.example.finalPart03.service.BankAccountService;
 import ir.example.finalPart03.service.OrderService;
@@ -49,6 +51,10 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public void finalPaymentByCustomerFromCredit(Long customerId, Long specialistId, Double paymentAmount, Long orderId) {
+        Order order = orderService.findById(orderId);
+        if (order.getOrderStatus() == OrderStatus.PAID){
+            throw new BadRequestException("this order is already PAID");
+        }
         Double payment = orderPaymentByCustomerFromCredit(customerId, paymentAmount);
         depositToSpecialistBalance(specialistId, payment);
         orderService.changeOrderStatusToPaid(orderId);

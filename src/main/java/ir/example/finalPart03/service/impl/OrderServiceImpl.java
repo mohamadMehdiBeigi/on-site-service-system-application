@@ -179,36 +179,40 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void checkOrdersAndUpdateScores(Long suggestionId, Long specialistId) {
 
-        List<Order> startedOrders = orderRepository.findAllByOrderStatus(OrderStatus.STARTED);
+//        List<Order> startedOrders = orderRepository.findAllByOrderStatus(OrderStatus.DONE);
 
-        for (Order order : startedOrders) {
-            LocalDateTime now = LocalDateTime.now();
-            if (now.isAfter(order.getStartDayOfWork())) {
-                long hoursPassed = Duration.between(order.getStartDayOfWork(), now).toHours();
-                Suggestions suggestion = suggestionsRepository.findById(suggestionId)
-                        .orElseThrow(() -> new NotFoundException("suggestion is not found"));
+//        for (Order order : startedOrders) {
+        Suggestions suggestion = suggestionsRepository.findById(suggestionId)
+                .orElseThrow(() -> new NotFoundException("suggestion is not found"));
+        if (suggestion.getOrder() != null && suggestion.getOrder().getOrderStatus() != OrderStatus.DONE) {
+            throw new NotFoundException("there is no orders with this status");
+        }
+        Order order = orderRepository.findById(suggestion.getOrder().getId()).orElseThrow(RuntimeException::new);
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(order.getStartDayOfWork())) {
+            long hoursPassed = Duration.between(order.getStartDayOfWork(), now).toHours();
+
 //                Suggestions suggestion = findRelevantSuggestionForOrder(order);
-                if (suggestion != null) {
-                    long hoursOfWork = Math.round(suggestion.getDurationOfDailyWork());
-                    if (hoursPassed > hoursOfWork) {
-                        long delayInHours = hoursPassed - hoursOfWork;
-                        Specialist specialist = specialistService.findById(specialistId);
-                        // Assume the score to deduct per hour of delay
-                        double SCORE_TO_DEDUCT_PER_HOUR = 1.0;
-                        double newScore = specialist.getAverageScores() - (delayInHours * SCORE_TO_DEDUCT_PER_HOUR);
-                        if (newScore <= 0) {
-                            specialist.setSpecialistStatus(SpecialistStatus.NEW);
-                            specialist.setAverageScores(0.0);
-                            specialistRepository.save(specialist);
-                        } else {
-                            specialist.setAverageScores(newScore);
-                            specialistRepository.save(specialist);
-                        }
-                    }
+
+            long hoursOfWork = Math.round(suggestion.getDurationOfDailyWork());
+            if (hoursPassed > hoursOfWork) {
+                long delayInHours = hoursPassed - hoursOfWork;
+                Specialist specialist = specialistService.findById(specialistId);
+                // Assume the score to deduct per hour of delay
+//                        double SCORE_TO_DEDUCT_PER_HOUR = 1.0;
+                double newScore = specialist.getAverageScores() - delayInHours;
+                if (newScore <= 0) {
+                    specialist.setSpecialistStatus(SpecialistStatus.NEW);
+                    specialist.setAverageScores(0.0);
+                    specialistRepository.save(specialist);
+                } else {
+                    specialist.setAverageScores(newScore);
+                    specialistRepository.save(specialist);
                 }
             }
         }
     }
+
 
     @PersistenceContext
     private EntityManager entityManager;

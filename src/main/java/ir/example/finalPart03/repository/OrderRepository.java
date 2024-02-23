@@ -53,4 +53,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "where s.id = :specialistId \n" +
             "and e.orderStatus = :orderStatus")
     List<Order> findAllBySpecialistIdAndOrderStatus(Long specialistId, OrderStatus orderStatus);
+
+    @Query(" select o from Suggestions s join s.order o where s.id =:suggestionId")
+    Optional<Order> findOrderBySuggestionId(Long suggestionId);
 }

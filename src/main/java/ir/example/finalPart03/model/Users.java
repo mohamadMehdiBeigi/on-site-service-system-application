@@ -101,10 +101,6 @@ public class Users extends BaseEntity<Long> implements UserDetails {
 
     @PrePersist
     private void preparePasswordAndOthers() {
-//        if (password == null || password.isEmpty()) {
-//            PasswordGenerator generator = new PasswordGenerator(8);
-//            this.password = generator.nextPassword();
-//        }
         this.signupDate = LocalDateTime.now();
         this.enabled = false;
         this.locked = false;

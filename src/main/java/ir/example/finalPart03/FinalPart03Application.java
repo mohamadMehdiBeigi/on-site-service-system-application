@@ -83,6 +83,6 @@ public class FinalPart03Application {
 //        System.out.println(byId.getAverageScores());
 
 //        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-//        System.out.println(bCryptPasswordEncoder.encode("1234mn"));
+//        System.out.println(bCryptPasswordEncoder.encode("admin"));
     }
 }

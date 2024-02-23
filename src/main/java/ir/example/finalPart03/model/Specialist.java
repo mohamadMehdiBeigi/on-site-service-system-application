@@ -6,23 +6,16 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
-//@Getter
-//@Setter
+
 @AllArgsConstructor
-//@NoArgsConstructor
 @Entity
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "final_part3")
-public class Specialist extends Users implements UserDetails {
+public class Specialist extends Users {
 
     @Enumerated(value = EnumType.STRING)
     SpecialistStatus specialistStatus;
@@ -77,38 +70,5 @@ public class Specialist extends Users implements UserDetails {
         this.subServices = subServices;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(getRole().name());
-        return Collections.singletonList(authority);    }
 
-    @Override
-    public String getPassword() {
-        return super.getPassword();
-    }
-
-    @Override
-    public String getUsername() {
-        return super.getEmail();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !super.getLocked();
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return super.getEnabled();
-    }
 }

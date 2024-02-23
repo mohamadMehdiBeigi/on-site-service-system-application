@@ -43,7 +43,7 @@ public class CustomerController {
     private final CaptchaService captchaService;
 
 
-    @PutMapping("/customer/changePassword/{customerId}/{oldPassword}/{password}/{confirmingPassword}")
+    @PutMapping("/changePassword/{customerId}/{oldPassword}/{password}/{confirmingPassword}")
     ResponseEntity<Void> changePassword(@PathVariable Long customerId, @PathVariable String oldPassword, @PathVariable String password, @PathVariable String confirmingPassword) {
         customerService.changePassword(customerId, oldPassword, password, confirmingPassword);
         return new ResponseEntity<>(HttpStatus.OK);

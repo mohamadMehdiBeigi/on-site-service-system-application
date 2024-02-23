@@ -1,6 +1,5 @@
 package ir.example.finalPart03.service.impl;
 
-import ir.example.finalPart03.config.PasswordGenerator;
 import ir.example.finalPart03.config.exceptions.BadRequestException;
 import ir.example.finalPart03.config.exceptions.DuplicateException;
 import ir.example.finalPart03.config.exceptions.NotFoundException;
@@ -58,19 +57,14 @@ public class SpecialistServiceImpl implements SpecialistService {
         if (!checkUniqueEmail(specialist.getEmail(), specialist.getId())) {
             throw new DuplicateException("this Email is already exists");
         }
-
-        PasswordGenerator generator = new PasswordGenerator(8);
-        String password = generator.nextPassword();
-        specialist.setPassword(passwordEncoder.encode(password));
+        specialist.setPassword(passwordEncoder.encode(specialist.getPassword()));
         specialist.setSpecialistStatus(SpecialistStatus.WAIT_FOR_CONFIRMED);
         try {
             specialist.setImage(ImageReader.uploadProfilePicture(file, specialist.getFirstname(), specialist.getLastname(), specialist.getEmail()));
 
         } catch (IOException e) {
-//            throw new BadRequestException("this file you selected is not supported");
-            e.printStackTrace();
+            throw new BadRequestException("this file you selected is not supported");
         }
-
         Specialist savedSpecialist;
         try {
             savedSpecialist = specialistRepository.save(specialist);
@@ -132,14 +126,16 @@ public class SpecialistServiceImpl implements SpecialistService {
         if (!Objects.equals(password, confirmingPassword)) {
             throw new RuntimeException("password and confirming password is not the same");
         }
+        String encodeOldPassword = passwordEncoder.encode(oldPassword);
+
         Specialist specialist = specialistRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("this specialistId is not found!"));
 
-        if (!Objects.equals(oldPassword, specialist.getPassword())) {
+        if (!Objects.equals(encodeOldPassword, specialist.getPassword())) {
             throw new BadRequestException("your oldPassword is incorrect, please enter your valid old password \n");
         }
-
-        specialist.setPassword(password);
+        String encode = passwordEncoder.encode(password);
+        specialist.setPassword(encode);
         return specialistRepository.save(specialist);
     }
 

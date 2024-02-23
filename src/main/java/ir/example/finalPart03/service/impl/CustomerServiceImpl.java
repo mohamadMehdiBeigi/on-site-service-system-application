@@ -71,13 +71,14 @@ public class CustomerServiceImpl implements CustomerService {
         if (!Objects.equals(password, confirmingPassword)) {
             throw new DuplicateException("password and confirming password is not the same");
         }
+        String encodeOldPassword = passwordEncoder.encode(oldPassword);
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("this customerId is not found!"));
-        if (!Objects.equals(oldPassword, customer.getPassword())) {
+        if (!Objects.equals(encodeOldPassword, customer.getPassword())) {
             throw new BadRequestException("your oldPassword is incorrect, please enter your valid old password \n");
         }
-
-        customer.setPassword(password);
+        String encode = passwordEncoder.encode(password);
+        customer.setPassword(encode);
         try {
             customerRepository.save(customer);
 

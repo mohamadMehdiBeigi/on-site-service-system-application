@@ -48,11 +48,13 @@ public class RegistrationController {
             @RequestParam String lastname,
             @RequestParam String email,
             @RequestParam String role,
+            @RequestParam String password,
             @RequestParam MultipartFile file) {
         Specialist specialist = new Specialist();
         specialist.setFirstname(firstname);
         specialist.setLastname(lastname);
         specialist.setEmail(email);
+        specialist.setPassword(password);
         Role byTitle = Role.findByTitle(role);
         specialist.setRole(byTitle);
         Specialist saveSpecialist = specialistService.saveSpecialist(specialist, file);
