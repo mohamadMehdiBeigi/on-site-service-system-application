@@ -2,6 +2,7 @@ package ir.example.finalPart03.controller;
 
 import ir.example.finalPart03.dto.bankAccountDto.BankAccountRequestDto;
 import ir.example.finalPart03.dto.bankAccountDto.BankAccountResponseDto;
+import ir.example.finalPart03.dto.bankAccountDto.BankAccountSavingDto;
 import ir.example.finalPart03.dto.commentDto.CommentRequestDto;
 import ir.example.finalPart03.dto.commentDto.CommentsResponseDto;
 import ir.example.finalPart03.dto.orderDto.OrderRequestDto;
@@ -11,6 +12,7 @@ import ir.example.finalPart03.model.*;
 import ir.example.finalPart03.service.*;
 import ir.example.finalPart03.service.impl.CaptchaService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -162,5 +164,13 @@ public class CustomerController {
         BankAccount bankAccByCustomerId = bankAccountService.findBankAccByCustomerId(customerId);
         BankAccountResponseDto bankAccountResponseDto = modelMapper.map(bankAccByCustomerId, BankAccountResponseDto.class);
         return new ResponseEntity<>(bankAccountResponseDto, HttpStatus.OK);
+    }
+
+    @PostMapping("/bankAccount/save")
+    public ResponseEntity<BankAccountResponseDto> saveBankAccount(@Valid @RequestBody BankAccountSavingDto bankAccountSavingDto) {
+        BankAccount bankAccount = BankAccountSavingDto.dtoToBankAccount(bankAccountSavingDto);
+        BankAccount saveBankAccount = bankAccountService.saveBankAccount(bankAccount, bankAccountSavingDto.getSpecialistId(), bankAccountSavingDto.getCustomerId());
+        BankAccountResponseDto bankAccountResponseDto = modelMapper.map(saveBankAccount, BankAccountResponseDto.class);
+        return new ResponseEntity<>(bankAccountResponseDto, HttpStatus.CREATED);
     }
 }

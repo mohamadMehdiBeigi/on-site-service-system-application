@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Table(schema = "final_part3")
 public class BankAccount extends BaseEntity<Long> implements Serializable {
 
-    @Column(name = "bank_account_number", nullable = false)
+    @Column(name = "bank_account_number", nullable = false, unique = true)
     @Pattern(regexp = "^(589463|627353|628023)\\d{10}$", message = "either this bank is not exist nor you must enter 16 number")
     String bankAccountNumber;
 

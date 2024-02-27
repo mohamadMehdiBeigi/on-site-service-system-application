@@ -1,11 +1,8 @@
 package ir.example.finalPart03.controller;
 
-import ir.example.finalPart03.dto.bankAccountDto.BankAccountResponseDto;
-import ir.example.finalPart03.dto.bankAccountDto.BankAccountSavingDto;
 import ir.example.finalPart03.dto.customerDto.CustomerRequestDto;
 import ir.example.finalPart03.dto.customerDto.CustomerResponseDto;
 import ir.example.finalPart03.dto.specialistDto.SpecialistResponseDto;
-import ir.example.finalPart03.model.BankAccount;
 import ir.example.finalPart03.model.Customer;
 import ir.example.finalPart03.model.Specialist;
 import ir.example.finalPart03.model.enums.Role;
@@ -63,7 +60,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/customer/save")
-    ResponseEntity<CustomerResponseDto> saveCustomer(@RequestBody CustomerRequestDto customerRequestDto) {
+    ResponseEntity<CustomerResponseDto> saveCustomer( @RequestBody CustomerRequestDto customerRequestDto) {
         Customer customer = modelMapper.map(customerRequestDto, Customer.class);
         Customer savedCustomer = customerService.saveCustomer(customer);
         CustomerResponseDto customerResponseDto = modelMapper.map(savedCustomer, CustomerResponseDto.class);
@@ -71,13 +68,6 @@ public class RegistrationController {
         return new ResponseEntity<>(customerResponseDto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/bankAccount/save")
-    public ResponseEntity<BankAccountResponseDto> saveBankAccount(@RequestBody BankAccountSavingDto bankAccountSavingDto) {
-        BankAccount bankAccount = BankAccountSavingDto.dtoToBankAccount(bankAccountSavingDto);
-        BankAccount saveBankAccount = bankAccountService.saveBankAccount(bankAccount, bankAccountSavingDto.getSpecialistId(), bankAccountSavingDto.getCustomerId());
-        BankAccountResponseDto bankAccountResponseDto = modelMapper.map(saveBankAccount, BankAccountResponseDto.class);
-        return new ResponseEntity<>(bankAccountResponseDto, HttpStatus.CREATED);
-    }
 
     @GetMapping("/confirm")
     public String confirm(@RequestParam("token") String token) {

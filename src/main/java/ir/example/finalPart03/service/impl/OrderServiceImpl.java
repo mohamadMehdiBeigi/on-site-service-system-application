@@ -269,7 +269,7 @@ public class OrderServiceImpl implements OrderService {
             typePredicate = criteriaBuilder.equal(orderRoot.get("customer").get("id"), entityId);
             criteriaQuery.where(typePredicate);
 
-            return entityManager.createQuery(criteriaQuery).getSingleResult() /2;
+            return entityManager.createQuery(criteriaQuery).getSingleResult();
 
         } else if (Specialist.class.isAssignableFrom(userType)) {
             criteriaQuery.select(criteriaBuilder.count(specialistJoin));
