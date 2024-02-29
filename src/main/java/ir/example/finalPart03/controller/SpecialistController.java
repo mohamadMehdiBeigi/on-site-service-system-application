@@ -44,11 +44,6 @@ public class SpecialistController {
         return new ResponseEntity<>(suggestionResponseDto, HttpStatus.CREATED);
     }
 
-    @PutMapping("/confirmingSpecialStatus/{specialistId}")
-    public ResponseEntity<Void> confirmingSpecialStatus(@PathVariable Long specialistId) {
-        specialistService.confirmingSpecialStatus(specialistId);
-        return ResponseEntity.ok().build();
-    }
 
     @PostMapping("/saveImageToFile/{specialistId}")
     public ResponseEntity<String> saveImageToFile(@PathVariable Long specialistId) {

@@ -78,6 +78,13 @@ public class AdminController {
         return ResponseEntity.ok(modelMapper.map(subServices, SubServiceResponseDto.class));
     }
 
+
+    @PutMapping("/confirmingSpecialStatus/{specialistId}")
+    public ResponseEntity<Void> confirmingSpecialStatus(@PathVariable Long specialistId) {
+        specialistService.confirmingSpecialStatus(specialistId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/findAllServices")
     public ResponseEntity<List<Services>> findAllServices() {
         return new ResponseEntity<>(servicesService.findAll(), HttpStatus.OK);
