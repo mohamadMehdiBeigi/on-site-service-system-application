@@ -8,6 +8,7 @@ import ir.example.finalPart03.dto.commentDto.CommentsResponseDto;
 import ir.example.finalPart03.dto.orderDto.OrderRequestDto;
 import ir.example.finalPart03.dto.orderDto.OrderResponseDto;
 import ir.example.finalPart03.dto.subServiceDto.SubServiceResponseDto;
+import ir.example.finalPart03.dto.suggestionDto.SuggestionResponseDto;
 import ir.example.finalPart03.model.*;
 import ir.example.finalPart03.service.*;
 import ir.example.finalPart03.service.impl.CaptchaService;
@@ -43,6 +44,8 @@ public class CustomerController {
     private final BankAccountService bankAccountService;
 
     private final CaptchaService captchaService;
+
+    private final SuggestionService suggestionService;
 
 
     @PutMapping("/changePassword/{customerId}/{oldPassword}/{password}/{confirmingPassword}")
@@ -87,6 +90,30 @@ public class CustomerController {
             subServiceResponseDtoList.add(subServiceResponseDto);
         }
         return ResponseEntity.ok(subServiceResponseDtoList);
+    }
+
+    @GetMapping("/findAllByCustomerIdOrOrderBySuggestedPrice/{customerId}")
+    public ResponseEntity<List<SuggestionResponseDto>> findAllByCustomerIdOrOrderBySuggestedPrice(@PathVariable Long customerId) {
+        List<Suggestions> allByCustomerIdOrOrderBySuggestedPrice = suggestionService.findAllByCustomerIdOrOrderBySuggestedPrice(customerId);
+        List<SuggestionResponseDto> suggestionResponseDtoList = new ArrayList<>();
+        for (Suggestions suggestion :
+                allByCustomerIdOrOrderBySuggestedPrice) {
+            SuggestionResponseDto suggestionResponseDto = modelMapper.map(suggestion, SuggestionResponseDto.class);
+            suggestionResponseDtoList.add(suggestionResponseDto);
+        }
+        return new ResponseEntity<>(suggestionResponseDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/findAllByCustomerIdOrOrderByTotalScores/{customerId}")
+    public ResponseEntity<List<SuggestionResponseDto>> findAllByCustomerIdOrOrderByTotalScores(@PathVariable Long customerId) {
+        List<Suggestions> allByCustomerIdOrOrderByTotalScores = suggestionService.findAllByCustomerIdOrOrderByTotalScores(customerId);
+        List<SuggestionResponseDto> suggestionResponseDtoList = new ArrayList<>();
+        for (Suggestions suggestion :
+                allByCustomerIdOrOrderByTotalScores) {
+            SuggestionResponseDto suggestionResponseDto = modelMapper.map(suggestion, SuggestionResponseDto.class);
+            suggestionResponseDtoList.add(suggestionResponseDto);
+        }
+        return ResponseEntity.ok(suggestionResponseDtoList);
     }
 
     @PutMapping("/changeOrderStatusToComingToYourPlace/{orderId}")

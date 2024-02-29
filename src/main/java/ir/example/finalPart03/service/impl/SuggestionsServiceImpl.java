@@ -41,6 +41,9 @@ public class SuggestionsServiceImpl implements SuggestionService {
             specialist.setId(specialistId);
             suggestions.setSpecialist(specialist);
         }
+        if (suggestions.getSuggestionsRegistrationDate() == null) {
+            suggestions.setSuggestionsRegistrationDate(LocalDateTime.now());
+        }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("this order id is not exist"));
@@ -65,16 +68,18 @@ public class SuggestionsServiceImpl implements SuggestionService {
                     "please type a valid time");
         }
         if (suggestions.getSuggestedTimeToStartWork().isBefore(order.getStartDayOfWork())) {
-            throw new BadRequestException("suggested Time to start work is before start day of work in order :" + order.getStartDayOfWork()  +
+            throw new BadRequestException("suggested Time to start work is before start day of work in order :" + order.getStartDayOfWork() +
                     " please type a valid time");
         }
-
+        Suggestions saveSuggestion;
         try {
-            return suggestionsRepository.save(suggestions);
-
+            saveSuggestion = suggestionsRepository.save(suggestions);
+            order.setOrderStatus(OrderStatus.WAITING_FOR_SPECIALIST_SELECTION);
+            orderRepository.save(order);
         } catch (Exception e) {
-            throw new BadRequestException("there is error with extracting order id \n" + e.getMessage());
+            throw new BadRequestException("there is error with saving suggestion \n" + e.getMessage());
         }
+        return saveSuggestion;
     }
 
     @Override

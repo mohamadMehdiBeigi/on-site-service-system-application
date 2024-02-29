@@ -21,7 +21,7 @@ public interface OrderService {
 
     Order changeOrderStatusWaitingForSelection(Long orderId);
 
-    Order changeOrderStatusToComingToYourPlace(Long orderId);
+    Order changeOrderStatusToComingToYourPlace(Long suggestionId);
 
     Order changeOrderStatusToStartedByCustomer(Long orderId, Long customerId);
 

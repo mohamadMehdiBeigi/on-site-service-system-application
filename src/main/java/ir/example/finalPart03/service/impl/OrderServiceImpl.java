@@ -115,7 +115,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order changeOrderStatusToComingToYourPlace(Long orderId) {
+    public Order changeOrderStatusToComingToYourPlace(Long suggestionId) {
+        Suggestions suggestions = suggestionsRepository.findById(suggestionId)
+                .orElseThrow(() -> new NotFoundException("this suggestion id is not found"));
+        Long orderId = suggestions.getOrder().getId();
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("this order id is not found!"));
         order.setOrderStatus(OrderStatus.WAITING_FOR_SPECIALIST_TO_COME_TO_YOUR_PLACE);
@@ -182,12 +186,12 @@ public class OrderServiceImpl implements OrderService {
         Suggestions suggestion = suggestionsRepository.findById(suggestionId)
                 .orElseThrow(() -> new NotFoundException("suggestion is not found"));
         if (suggestion.getOrder() != null && suggestion.getOrder().getOrderStatus() != OrderStatus.DONE) {
-            throw new NotFoundException("there is no orders with this status");
+            throw new NotFoundException("order status with this id is not DONE yet");
         }
         Order order = orderRepository.findById(suggestion.getOrder().getId()).orElseThrow(RuntimeException::new);
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(order.getStartDayOfWork())) {
-            long hoursPassed = Duration.between(order.getStartDayOfWork(), now).toHours();
+            long hoursPassed = Duration.between(suggestion.getSuggestedTimeToStartWork(), now).toHours();
 
 
             long hoursOfWork = Math.round(suggestion.getDurationOfDailyWork());

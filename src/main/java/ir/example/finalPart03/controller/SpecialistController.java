@@ -71,17 +71,7 @@ public class SpecialistController {
         return new ResponseEntity<>(specialistResponseDto, HttpStatus.OK);
     }
 
-    @GetMapping("/findAllByCustomerIdOrOrderBySuggestedPrice/{customerId}")
-    public ResponseEntity<List<SuggestionResponseDto>> findAllByCustomerIdOrOrderBySuggestedPrice(@PathVariable Long customerId) {
-        List<Suggestions> allByCustomerIdOrOrderBySuggestedPrice = suggestionService.findAllByCustomerIdOrOrderBySuggestedPrice(customerId);
-        List<SuggestionResponseDto> suggestionResponseDtoList = new ArrayList<>();
-        for (Suggestions suggestion :
-                allByCustomerIdOrOrderBySuggestedPrice) {
-            SuggestionResponseDto suggestionResponseDto = modelMapper.map(suggestion, SuggestionResponseDto.class);
-            suggestionResponseDtoList.add(suggestionResponseDto);
-        }
-        return new ResponseEntity<>(suggestionResponseDtoList, HttpStatus.OK);
-    }
+
 
     @GetMapping("/seeScoreBySpecialistId/{specialistId}")
     public ResponseEntity<List<Double>> findAllScoresBySpecialistId(@PathVariable Long specialistId) {
@@ -97,17 +87,6 @@ public class SpecialistController {
         return ResponseEntity.accepted().body(collect);
     }
 
-    @GetMapping("/findAllByCustomerIdOrOrderByTotalScores/{customerId}")
-    public ResponseEntity<List<SuggestionResponseDto>> findAllByCustomerIdOrOrderByTotalScores(@PathVariable Long customerId) {
-        List<Suggestions> allByCustomerIdOrOrderByTotalScores = suggestionService.findAllByCustomerIdOrOrderByTotalScores(customerId);
-        List<SuggestionResponseDto> suggestionResponseDtoList = new ArrayList<>();
-        for (Suggestions suggestion :
-                allByCustomerIdOrOrderByTotalScores) {
-            SuggestionResponseDto suggestionResponseDto = modelMapper.map(suggestion, SuggestionResponseDto.class);
-            suggestionResponseDtoList.add(suggestionResponseDto);
-        }
-        return ResponseEntity.ok(suggestionResponseDtoList);
-    }
 
     @GetMapping("/findOrder/{orderId}")
     public ResponseEntity<OrderResponseDto> findById(@PathVariable Long orderId) {

@@ -160,6 +160,9 @@ public class SpecialistServiceImpl implements SpecialistService {
     public void addSubServiceToSpecialist(Long specialistId, Long subServiceId) {
         Specialist specialist = specialistRepository.findById(specialistId)
                 .orElseThrow(() -> new NotFoundException("Specialist not found"));
+        if (specialist.getSpecialistStatus() == SpecialistStatus.NEW || specialist.getSpecialistStatus() == SpecialistStatus.WAIT_FOR_CONFIRMED){
+            throw new BadRequestException("this specialist status is new or waiting for confirmed, first it must've confirmed by admin");
+        }
         SubServices subService = subServicesRepository
                 .findById(subServiceId).orElseThrow(() -> new NotFoundException("SubService not found"));
 

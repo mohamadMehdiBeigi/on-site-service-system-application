@@ -14,14 +14,14 @@ public interface SuggestionsRepository extends JpaRepository<Suggestions, Long> 
             "join s.order o " +
             "join o.customer c " +
             "where c.id =:customerId " +
-            "order by s.suggestedPrice")
+            "order by s.suggestedPrice desc ")
     List<Suggestions> findAllByCustomerIdOrderBySuggestedPrice(Long customerId);
 
 
     @Query(" from Suggestions s " +
             "join s.order.customer c " +
             "where c.id =:customerId " +
-            "order by s.specialist.averageScores ")
+            "order by s.specialist.averageScores desc ")
     List<Suggestions> findAllByCustomerIdOrderByTotalScores(Long customerId);
 
     List<Suggestions> findAllBySpecialistId(Long specialistId);
